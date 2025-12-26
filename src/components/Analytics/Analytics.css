@@ -1,0 +1,27 @@
+.boxes-container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.boxes-container .box {
+  padding: 40px;
+  border-radius: 8px;
+  gap: 20px;
+  min-width: 200px;
+  flex: 0 0 35%;
+}
+
+.boxes-container .box1 {
+  background-color: #ffe0b2;
+}
+
+.boxes-container .box2 {
+  background-color: #d1c4e9;
+}
+.boxes-container .box3 {
+  background-color: #c8e6c9;
+}
+.boxes-container .box4 {
+  background-color: #bbdefb;
+}

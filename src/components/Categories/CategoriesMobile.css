@@ -1,0 +1,44 @@
+.categories-mobile {
+  display: none;
+}
+
+.categories_text {
+  display: none;
+}
+
+@media (max-width: 576px) {
+  .categories_text {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 50px;
+    color: black;
+    letter-spacing: 3px;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    padding: 20px;
+  }
+
+.categories-mobile {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 20px;
+    gap: 20px;
+  }
+
+  .cat-image img {
+    background: #ddd;
+    object-fit: contain;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+  }
+
+  .cat-image h4 {
+    font-size: 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+}

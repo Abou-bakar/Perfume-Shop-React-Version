@@ -1,0 +1,58 @@
+
+.floating_btn {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+}
+
+.floating_btn a {
+  text-decoration: none;
+}
+
+.contact_icon {
+  background-color: black;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  font-size: 30px;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  transition: transform 0.3s ease-in-out;
+}
+
+.contact_icon:hover {
+  transform: scale(1.1);
+}
+
+.text_icon {
+  bottom: 83px;
+  right: 15px;
+  position: absolute;
+  background: black;
+  margin-top: 8px;
+  color: white;
+  font-size: 12px;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+@media (max-width:576px) {
+    .floating_btn {
+    width: 100px;
+    height: 100px;
+    bottom: 80px;
+    right: 10px;
+  }
+}

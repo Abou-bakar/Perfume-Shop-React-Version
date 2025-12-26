@@ -1,0 +1,109 @@
+
+
+nav {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 20px;
+  /* position: relative; */
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+
+.nav-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.nav-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  flex: none;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.logo-link {
+  text-decoration: none;
+}
+
+.nav-center img {
+  width: 25px;
+  height: auto;
+}
+
+.nav-center h1 {
+  font-size: 22px;
+  color: black;
+  margin: 0;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.nav-right i {
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-right i:hover {
+  color: gray;
+}
+
+.nav-left ul {
+  list-style-type: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-left li {
+  display: inline;
+  margin-right: 20px;
+  font-size: 16px;
+}
+
+.nav-left a {
+  text-decoration: none;
+  color: black;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.nav-left a:hover {
+  color: gray;
+}
+
+.nav-left a.active {
+  color: #333;
+  border-bottom: 2px solid black;
+  padding-bottom: 2px;
+}
+
+.nav-left a,
+.nav-left a:focus,
+.nav-left a:active,
+.nav-left a.active {
+  background-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}

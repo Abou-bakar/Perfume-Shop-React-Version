@@ -1,0 +1,70 @@
+.landscape {
+  width: 100%;
+  padding: 50px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.landscape .landscape-swiper {
+  width: 100%;
+  /* max-width: 1155px; */
+  height: auto;
+  margin: 0 30px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.landscape .swiper-slide {
+  width: 100% !important;
+}
+
+.landscape img {
+  width: 100%;
+  height: 80vh;
+  object-fit: cover;
+  display: block;
+}
+
+.landscape .swiper-button-next,
+.landscape .swiper-button-prev {
+  color: black;
+  z-index: 10;
+  position: absolute;
+}
+
+.landscape .swiper-pagination-bullet {
+  background: black;
+  z-index: 10;
+  position: relative;
+}
+
+.landscape .swiper-pagination-bullet-active {
+  background: black;
+}
+
+
+@media (max-width: 992px) {
+  .landscape {
+  padding: 0 0;
+}
+
+  .landscape .landscape-swiper {
+  height: 60svh;
+  margin: 0 0;
+  border-radius: 0;
+}
+
+.landscape img {
+  height: 60svh;
+}
+}
+
+@media (max-width: 576px) {
+  .landscape .landscape-swiper {
+  height: 40svh;
+}
+
+.landscape img {
+  height: 40svh;
+}
+}

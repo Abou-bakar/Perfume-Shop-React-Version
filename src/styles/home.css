@@ -1,0 +1,371 @@
+* {
+  margin: 0;
+  padding: 0;
+  /* box-sizing: border-box; */
+}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+  background: #f5f5f5 !important;
+}
+
+p,
+li {
+  font-family: "Roboto", sans-serif;
+}
+
+button,
+input,
+select,
+textarea,
+span {
+  font-family: "Poppins", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Poppins", sans-serif;
+}
+
+
+.hero-swiper {
+  width: 100%;
+  height: 100vh;
+  max-height: 650px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-swiper .swiper-wrapper {
+  /* display: flex; */
+  width: 100%;
+  height: 100%;
+}
+
+.hero-swiper .swiper-slide {
+  width: 100% !important;
+  height: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+}
+
+.slide-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* SLIDE 1 - MINT */
+.hero-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: clamp(10px, 2vw, 20px);
+  justify-items: center;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  /* padding: 40px; */
+  z-index: 1;
+}
+
+.hero-content span {
+  font-size: clamp(1.5rem, 5vw, 6rem);
+  font-weight: 400;
+  color: #fff;
+  line-height: 100%;
+  user-select: none;
+}
+
+.leaves-image {
+  position: absolute;
+  width: clamp(250px, 40vw, 684px);
+  height: auto;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.leaves-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mint-image {
+  position: absolute;
+  width: clamp(120px, 18vw, 300px);
+  height: auto;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-29.9deg);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mint-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* SLIDE 2 - PINK FLORAL */
+.hero-content2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, auto);
+  gap: clamp(20px, 4vw, 40px);
+  width: 80%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content2 span {
+  font-size: clamp(2rem, 8vw, 6.25rem);
+  font-weight: 400;
+  letter-spacing: clamp(5px, 1vw, 10px);
+  color: #fff;
+  line-height: 100%;
+  user-select: none;
+}
+
+.pink-leaves-image {
+  position: absolute;
+  width: clamp(300px, 50vw, 684px);
+  height: auto;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pink-leaves-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pink-image {
+  position: absolute;
+  width: clamp(150px, 20vw, 230px);
+  height: auto;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-29.9deg);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pink-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* SLIDE 3 - PARADOX */
+.hero-content3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, auto);
+  gap: clamp(15px, 3vw, 30px);
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-content3 span {
+  font-size: clamp(2rem, 8vw, 6.25rem);
+  font-weight: 400;
+  letter-spacing: clamp(10px, 3vw, 55px);
+  color: #fff;
+  line-height: 100%;
+  user-select: none;
+}
+
+.brown-leaves-image1,
+.brown-leaves-image2,
+.brown-leaves-image3 {
+  position: absolute;
+  z-index: 2;
+  width: clamp(150px, 25vw, 315px);
+  pointer-events: none;
+}
+
+.brown-leaves-image1 {
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.brown-leaves-image2 {
+  bottom: 15%;
+  left: clamp(5%, 28%, 28%);
+}
+
+.brown-leaves-image3 {
+  bottom: 5%;
+  right: clamp(5%, 24%, 24%);
+}
+
+.brown-leaves-image1 img,
+.brown-leaves-image2 img,
+.brown-leaves-image3 img {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  display: block;
+}
+
+.brown-image {
+  position: absolute;
+  width: clamp(250px, 35vw, 450px);
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-29.9deg);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.brown-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Swiper Navigation Buttons */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #fff;
+}
+
+.swiper-pagination-bullet {
+  background: #fff;
+}
+
+.swiper-pagination-bullet-active {
+  background: #fff;
+}
+
+/* .swiper-slide-active {
+  z-index: 10;
+} */
+
+/* Section Styling */
+
+
+
+
+.grid-item.wide {
+  grid-column: span 1;
+}
+
+.grid-item.wide2 {
+  grid-column: span 1;
+}
+
+.grid-item.tall {
+  grid-row: span 1;
+}
+
+.grid-item {
+  
+}
+
+
+
+
+
+
+.floating_btn {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+}
+
+.floating_btn a {
+  text-decoration: none;
+}
+
+.contact_icon {
+  background-color: black;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  font-size: 30px;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  transition: transform 0.3s ease-in-out;
+}
+
+.contact_icon:hover {
+  transform: scale(1.1);
+}
+
+.text_icon {
+  bottom: 83px;
+  right: 15px;
+  position: absolute;
+  background: black;
+  margin-top: 8px;
+  color: white;
+  font-size: 12px;
+  padding: 5px;
+  border-radius: 12px;
+}

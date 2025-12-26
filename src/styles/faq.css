@@ -1,0 +1,20 @@
+.faqs {
+  padding: 80px 20px;
+}
+
+.faqs .container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faqs h1 {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+
+
+ @media (max-width:480px){
+      .question { padding: 14px; }
+      .answer { padding-left: 14px; padding-right: 14px; }
+    }

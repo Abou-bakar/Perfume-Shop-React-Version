@@ -1,0 +1,28 @@
+.thumbnail-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.thumbnail-container img {
+  width: 90px;
+  height: 90px;
+  border: 2px solid transparent;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.3s;
+}
+
+.thumbnail-container img:hover {
+  transform: scale(1.05);
+}
+
+.thumbnail-container img.active {
+  border: 2px solid black;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+  border-color: black;
+}

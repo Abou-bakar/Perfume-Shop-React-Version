@@ -1,0 +1,53 @@
+.header {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 36px;
+  margin-bottom: 50px;
+  letter-spacing: 2px;
+}
+
+.abt {
+  display: flex;
+  align-items: center;
+  margin: 10px 10px;
+  margin-bottom: 50px;
+  justify-content: center;
+}
+
+.about-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  object-fit: cover;
+  display: block;
+}
+
+.about-desc {
+  margin: 50px;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.about-desc h4 {
+  font-weight: 600;
+  font-size: clamp(20px, 4vw, 30px);
+}
+
+.about-desc p {
+  font-size: clamp(14px, 2vw, 20px);
+}
+
+@media (max-width: 576px) {
+  .abt {
+  margin: 10px 0;
+}
+  .about-image img {
+  border-radius: 0;
+}
+
+.about-desc {
+  margin: 20px;
+  line-height: 1.7;
+  text-align: left;
+}
+}

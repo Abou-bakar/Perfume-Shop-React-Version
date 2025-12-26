@@ -1,0 +1,15 @@
+.low-stock-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  width: 200px;
+}
+
+.low-stock-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}

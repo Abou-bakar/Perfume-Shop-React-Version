@@ -1,0 +1,40 @@
+.top-sellers {
+  padding: 80px 20px;
+  background-color: #f5f5f5;
+  text-align: left;
+  overflow: hidden;
+}
+
+.top-sellers h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  color: black;
+  letter-spacing: 3px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.top-sellers .swiper-slide {
+  /* flex: 0 0 calc(24% - 20px); */
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+
+/* .product-container::-webkit-scrollbar {
+  display: none;
+} */
+
+.top-sellers .swiper-pagination {
+  position: relative;
+  margin-top: 30px;
+}
+
+.top-sellers .swiper-pagination-bullet {
+  background: #000;
+}
+
+.top-sellers .swiper-pagination-bullet-active {
+  background: #000;
+}

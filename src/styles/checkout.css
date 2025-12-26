@@ -1,0 +1,248 @@
+.checkout-nav {
+  background: white;
+  color: black;
+  height: 4vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkout-nav a {
+  color: black;
+  text-decoration: none;
+}
+
+.checkout-nav h2 {
+   font-size: clamp(14px, 1.5vw, 18px);
+}
+
+.checkout-nav i {
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.checkout-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  border: 1px solid #ddd;
+}
+
+.checkout-left {
+  flex: 1;
+  background: #fff;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.checkout-left .checkout-section {
+  margin-bottom: 30px;
+}
+
+.checkout-left h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  padding-bottom: 5px;
+}
+
+.checkout-section .name {
+  display: flex;
+  gap: 10px;
+}
+
+.checkout-section .citycode {
+  display: flex;
+  gap: 10px;
+}
+
+.checkout-section input[type="text"],
+.checkout-section input[type="email"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.checkout-left label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.checkout-left input[type="radio"] {
+  /* appearance: none; */
+  width: 18px;
+  height: 18px;
+  border: 2px solid #666;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+
+/* .checkout-left input[type="radio"]:checked::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 2px;
+  left: 2px;
+  background: black;
+  border-radius: 50%;
+} */
+
+.accordion-item-checkout {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: #f2f2f2;
+}
+
+.accordion-header-checkout,
+.accordion-content-checkout {
+  background: none;
+}
+
+.accordion-header-checkout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.accordion-content-checkout {
+  padding: 14px;
+}
+
+.accordion-shipping {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: #f2f2f2;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.accordion-content-checkout {
+  display: none;
+  padding: 20px;
+  background: #fff;
+  /* border-top: 1px solid #ddd; */
+}
+
+.accordion-item-checkout.active .accordion-content-checkout {
+  display: block;
+}
+
+.billing-form input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.complete-order {
+  background: black;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid black;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.complete-order:hover {
+  background: white;
+  color: black;
+  border: 1px solid black;
+}
+
+.checkout-right {
+  flex: 0.8;
+  position: sticky;
+  background: hsl(0deg 0% 96.47%);
+  border-left: 2px solid #ddd;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.order-items {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* background: #fff; */
+  border-bottom: 1px solid #666;
+  padding: 10px 14px;
+  /* border-radius: 6px; */
+}
+
+.order-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.order-item-content p {
+  flex: 1; /* makes it expand to fill space */
+  margin: 0 10px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.order-item-content span {
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.order-items img {
+  aspect-ratio: 1 / 1;
+  width: 60px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.order-summary {
+  border-top: 2px solid black;
+  padding-top: 10px;
+}
+
+.order-summary p {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .checkout-wrapper {
+    flex-direction: column;
+  }
+  .checkout-right {
+    border-left: none;
+    border-top: 2px solid #ddd;
+  }
+}

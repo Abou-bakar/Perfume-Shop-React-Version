@@ -1,0 +1,57 @@
+.hero-swiper {
+  width: 100%;
+  height: 100vh; /* or 70vh if you want smaller */
+}
+
+.hero-slide {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden; /* IMPORTANT */
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* crop instead of stretch */
+}
+
+/* Desktop */
+.desktop-img {
+  display: block;
+}
+
+/* Mobile */
+.mobile-img {
+  display: none;
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+  .desktop-img {
+    display: none;
+  }
+
+  .mobile-img {
+    display: block;
+  }
+
+  .hero-swiper {
+    height: 80svh;
+  }
+
+  .hero-img {
+    height: 80svh;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .hero-swiper {
+    height: 60svh;
+  }
+
+    .hero-img {
+    height: 60svh;
+  }
+}
