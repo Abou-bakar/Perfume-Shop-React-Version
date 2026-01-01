@@ -1,0 +1,60 @@
+.product-carousel {
+    padding: 80px 20px;
+    background: #f7f7f7;
+    text-align: left;
+    overflow: hidden;
+}
+
+.product-carousel h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  color: black;
+  letter-spacing: 3px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.product-carousel .swiper-slide {
+    box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+
+.product-carousel .swiper-pagination {
+    position: relative;
+  margin-top: 30px;
+}
+
+.deals-pagination,
+.sellers-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.product-carousel .swiper-pagination-bullet,
+.product-carousel .swiper-pagination-bullet-active {
+  background: #000;
+  height: 10px;
+  width: 10px;
+}
+
+.product-carousel .view-all-btn {
+  display: flex;
+  margin: 20px auto 0;
+  background: #000;
+  color: #fff;
+  border: 2px solid black;
+  padding: 15px 78px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.product-carousel .view-all-btn:hover {
+  background: white;
+  color: black;
+}
