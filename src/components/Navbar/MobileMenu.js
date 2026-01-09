@@ -1,35 +1,46 @@
 import AccordionItem from "./AccordionItem";
+import { createPortal } from "react-dom";
 import "./MobileMenu.css";
+import { Link } from "react-router-dom";
 
-function MobileMenu() {
-  return (
-    <div className="mobile-menu">
+const MobileMenu = ({isOpen, onClose}) => {
+  return createPortal(
+    <>
+     {/* Overlay */}
+      {/* <div
+        className={`nav-overlay ${isOpen ? "show" : ""}`}
+        onClick={onClose}
+      /> */}
+
+        <div className={`mobile-menu ${isOpen ? "open": ""}`}>
       {/* Header */}
-      <div className="mobile-menu-header"></div>
+      <div className="mobile-menu-header">
+        <i className="fa-solid fa-xmark" onClick={onClose}></i>
+      </div>
 
     {/* Men */}
       <AccordionItem title="Men">
-        <a href="/">Perfumes</a>
-        <a href="/">Perfume Oils</a>
-        <a href="/">Deodorants</a>
+        <Link to="/">Perfumes</Link>
+        <Link to="/">Perfume Oils</Link>
+        <Link to="/">Deodorants</Link>
       </AccordionItem>
 
     {/* Women */}
       <AccordionItem title="Women">
-        <a href="/">Perfumes</a>
-        <a href="/">Mists</a>
-        <a href="/">Deodorants</a>
+        <Link to="/">Perfumes</Link>
+        <Link to="/">Mists</Link>
+        <Link to="/">Deodorants</Link>
       </AccordionItem>
 
     {/* Sale */}
       <AccordionItem title="Sale">
-        <a href="/">Men&apos;s Sale</a>
-        <a href="/">Women&apos;s Sale</a>
-        <a href="/">Clearance</a>
+        <Link to="/">Men&apos;s Sale</Link>
+        <Link to="/">Women&apos;s Sale</Link>
+        <Link to="/">Clearance</Link>
       </AccordionItem>
 
     {/* Contact */}
-      <h4>Contact</h4>
+     <AccordionItem title="Contact">
       <p className="help_text">Need help?</p>
 
       <div className="cont_info">
@@ -41,12 +52,21 @@ function MobileMenu() {
         <i className="fa-solid fa-envelope"></i>
         <p>info@perfumesmists.pk</p>
       </div>
+      </AccordionItem>
 
       {/* Footer */}
       <div className="menu-bar-ftr">
         <h4>Perfumes Mists</h4>
+         <div className="icons">
+            <i className="fa-brands fa-facebook-f"></i>
+            <i className="fa-brands fa-instagram"></i>
+            <i className="fa-brands fa-x-twitter"></i>
+          </div>
       </div>
     </div>
+    </>,
+    document.body
+
   );
 }
 

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 import "./ProductInfo.css";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 
 const ProductInfo = ({ title, price, salePrice }) => {
   const sizes = ["50ml", "100ml", "200ml"];
+  const [selectedSize, setSelectedSize] = useState(sizes[0])
 
   return (
     <div className="product-info">
@@ -22,14 +23,15 @@ const ProductInfo = ({ title, price, salePrice }) => {
 
       <div className="size">
         <p id="size-text">
-          Size: <span id="selected-size">50ml</span>
+          Size: <span id="selected-size">{selectedSize}</span>
         </p>
 
       <div className="size-options">
         {sizes.map((size, index) => (
           <div
             key={index}
-            className={`size-box ${index === 0 ? "active" : ""}`}
+            className={`size-box ${selectedSize === size ? "active" : ""}`}
+            onClick={()=> setSelectedSize(size)}
           >
             {size}
           </div>

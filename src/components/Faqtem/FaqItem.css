@@ -43,13 +43,15 @@
   text-align: justify;
 }
 
-.answer.open {
-  padding: 20px;
+.answer.active {
+ max-height: 500px;
 }
 
 .question.active + .answer {
   /* max-height: 500px; */
   padding: 20px;
+  background: white;
+  color: black;
 }
 
 .question.active {
@@ -58,5 +60,5 @@
 }
 
 .question.active i {
-  transform: rotate(180deg);
+  transform: rotate(225deg);
 }

@@ -80,3 +80,9 @@ h3,
 h4 {
   font-family: "Poppins", sans-serif;
 }
+
+body.menu-open {
+  overflow: hidden;
+  height: 100%;
+  touch-action: none;
+}

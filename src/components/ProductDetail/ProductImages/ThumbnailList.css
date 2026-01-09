@@ -26,3 +26,7 @@
   transform: scale(1.05);
   border-color: black;
 }
+
+.thumb.active {
+  border-color: black;
+}

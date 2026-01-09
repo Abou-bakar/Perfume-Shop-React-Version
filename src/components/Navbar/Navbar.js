@@ -1,124 +1,168 @@
-import logo from '../../assets/images/logo.png'
-import AccordionItem from "./AccordionItem"
-import "./Navbar.css"
-import "./MobileMenu.css"
-import { Link, NavLink } from 'react-router-dom'
+import logo from "../../assets/images/logo.png";
+import AccordionItem from "./AccordionItem";
+import "./Navbar.css";
+import "./MobileMenu.css";
+import { Link, NavLink } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import MobileMenu from "./MobileMenu";
+import CartDrawer from "../CartDrawer/CartDrawer";
 
 const Navbar = () => {
+  const [searchActive, setSearchActive] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        searchActive &&
+        searchRef.current &&
+        !searchRef.current.contains(e.target)
+      ) {
+        setSearchActive(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [searchActive]);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add("menu-open");
+    } else {
+      document.body.classList.remove("menu-open");
+    }
+
+    return () => {
+      document.body.classList.remove("menu-open");
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+  document.body.style.overflow = cartOpen ? "hidden" : "";
+  return () => (document.body.style.overflow = "");
+}, [cartOpen]);
+
+
   return (
-    <nav>
-      <input type="checkbox" id="menu-toggle" className="menu-toggle" />
+    <>
+      {/* Blur Overlay - Shows when search is active */}
+      {searchActive && <div className="blur-overlay" />}
 
-      <label htmlFor="menu-toggle" className="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </label>
+      <nav>
+        <label
+          className={`hamburger ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
 
-      {/* Mobile Menu Sidebar */}
-      <div className="mobile-menu">
-        <div className="mobile-menu-header"></div>
-        
-        <AccordionItem title="Men">
-            <a href="perfumes">Perfumes</a>
-            <a href="perfumes">Perfume Oils</a>
-            <a href="perfumes">Deodorants</a>
-        </AccordionItem>
-
-        <AccordionItem title="Women">
-            <a href="perfumes">Perfumes</a>
-            <a href="perfumes">Mists</a>
-            <a href="perfumes">Deodorants</a>
-        </AccordionItem>
-
-        <AccordionItem title="Sale">
-            <a href="perfumes">Men's Sale</a>
-            <a href="perfumes">Women's Sale</a>
-            <a href="perfumes">Clearance</a>
-        </AccordionItem>
-
-        <AccordionItem title="Contact">
-            <p className="help_text">Need help?</p>
-
-            <div className="cont_info">
-            <i className="fa-solid fa-phone"></i>
-            <p>+923331234567</p>
-            </div>
-
-            <div className="cont_info">
-            <i className="fa-solid fa-envelope"></i>
-            <p>info@perfumesmists.pk</p>
-            </div>
-        </AccordionItem>
-
-        <div className="menu_bar_ftr">
-            <h4>Perfumes Mists</h4>
-            <div className="icons">
-                <i className="fa-brands fa-facebook-f"></i>
-                <i className="fa-brands fa-instagram"></i>
-                <i className="fa-brands fa-x-twitter"></i>
-            </div>
-        </div>
-        </div>
+        {/* Mobile Menu Sidebar */}
+        <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
         {/* Desktop Menu */}
-         <div className="nav-left">
-        <ul>
-          <li><NavLink to="/products" className={({ isActive}) => 
-          isActive ? "active" : ""}
-          >
-          Men
-          </NavLink>
-          </li>
-          <li><NavLink to="/products" className={({ isActive }) => 
-          isActive ? "active" : ""
-          }>Women</NavLink></li>
-          <li><NavLink to="/sale" className={({ isActive }) =>
-          isActive ? "active" : ""
-          }>Sale</NavLink></li>
-        </ul>
-      </div>
-
-         {/* Logo */}
-      <div className="nav-center">
-        <Link className="logo-link" to="/" aria-label="Go to home">
-          <span className="logo">
-            <img src={logo} alt="" />
-            <h1>
-              Perfumes<br />
-              Mists
-            </h1>
-          </span>
-        </Link>
-      </div>
-
-      {/* Right Icons */}
-      <div className="nav-right">
-        <i className="fa-solid fa-bag-shopping" id="cart-icon"></i>
-        {/* <span id="cart-count">0</span> */}
-        <i className="fa-solid fa-magnifying-glass"></i>
-      </div>    
-
-        {/* Cart Sidebar */}
-        {/* <div className="cart-container">
-        <div className="cart-header">
-          <h3>Your Cart</h3>
-          <i className="fa-solid fa-xmark"></i>
+        <div className="nav-left">
+          <ul>
+            <li>
+              <NavLink
+                to="/products"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Men
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/products"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Women
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/sale"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Sale
+              </NavLink>
+            </li>
+          </ul>
         </div>
 
-        <div className="cart-items"></div>
-
-        <div className="cart-summary">
-          <p>Subtotal: $<span>0</span></p>
-          <button>Checkout</button>
+        {/* Logo */}
+        <div className="nav-center">
+          <Link className="logo-link" to="/" aria-label="Go to home">
+            <span className="logo">
+              <img src={logo} alt="" />
+              <h1>
+                Perfumes
+                <br />
+                Mists
+              </h1>
+            </span>
+          </Link>
         </div>
-      </div> */}
 
-        {/* Overlay */}
-      <label htmlFor="menu-toggle" className="nav-overlay"></label>
+        {/* Right Icons */}
+        <div className="nav-right">
+          <i
+            className="fa-solid fa-bag-shopping"
+            id="cart-icon"
+            onClick={() => setCartOpen(true)}
+          ></i>
+          {/* <span id="cart-count">0</span> */}
+          <i
+            className="fa-solid fa-magnifying-glass"
+            onClick={() => setSearchActive(true)}
+          ></i>
+        </div>
+      </nav>
 
-    </nav>
-  )
-}
+        {/* Cart Drawer */}
+    <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)}>
+      <div className="cart-header">
+        <h3>Your Cart</h3>
+        <i 
+          className="fa-solid fa-xmark" 
+          onClick={() => setCartOpen(false)}
+        ></i>
+      </div>
 
-export default Navbar
+      <div className="cart-items">
+        {/* Your cart items will go here */}
+      </div>
+
+      <div className="cart-summary">
+        <p>
+          Subtotal: $<span>0</span>
+        </p>
+        <button className="checkout-btn">Checkout</button>
+      </div>
+    </CartDrawer>
+
+      {/* Search Bar - Shows when searchActive is true */}
+      {searchActive && (
+        <div className="search-container">
+          <div ref={searchRef} className="search-box">
+            <i className="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search Products..." autoFocus />
+            <button
+              className="close-btn"
+              onClick={() => setSearchActive(false)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Navbar;
