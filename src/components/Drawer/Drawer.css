@@ -1,0 +1,57 @@
+.drawer-overlay {
+ position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  height: 100dvh;
+  background: white;
+  z-index: 1000;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+/* Right drawer (Cart) */
+.drawer-right {
+  right: 0;
+  transform: translateX(100%);
+}
+
+/* Left drawer (Mobile menu) */
+.drawer-left {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.drawer.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+
+@keyframes slideInRight {
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  to {
+    transform: translateX(0);
+  }
+}

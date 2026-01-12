@@ -5,7 +5,7 @@ import "./MobileMenu.css";
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import MobileMenu from "./MobileMenu";
-import CartDrawer from "../CartDrawer/CartDrawer";
+import Drawer from "../Drawer/Drawer";
 
 const Navbar = () => {
   const [searchActive, setSearchActive] = useState(false);
@@ -29,23 +29,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchActive]);
 
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.classList.add("menu-open");
-    } else {
-      document.body.classList.remove("menu-open");
-    }
-
-    return () => {
-      document.body.classList.remove("menu-open");
-    };
-  }, [menuOpen]);
-
-  useEffect(() => {
-  document.body.style.overflow = cartOpen ? "hidden" : "";
-  return () => (document.body.style.overflow = "");
-}, [cartOpen]);
-
 
   return (
     <>
@@ -62,8 +45,15 @@ const Navbar = () => {
           <span></span>
         </label>
 
-        {/* Mobile Menu Sidebar */}
-        <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+        <Drawer
+  isOpen={menuOpen}
+  onClose={() => setMenuOpen(false)}
+  position="left"
+  width="90%"
+>
+  <MobileMenu onClose={() => setMenuOpen(false)} />
+</Drawer>
+
 
         {/* Desktop Menu */}
         <div className="nav-left">
@@ -124,27 +114,33 @@ const Navbar = () => {
         </div>
       </nav>
 
-        {/* Cart Drawer */}
-    <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)}>
-      <div className="cart-header">
-        <h3>Your Cart</h3>
-        <i 
-          className="fa-solid fa-xmark" 
-          onClick={() => setCartOpen(false)}
-        ></i>
-      </div>
+     {/* Cart Drawer */}
+<Drawer
+  isOpen={cartOpen}
+  onClose={() => setCartOpen(false)}
+  position="right"
+  width="380px"
+>
+  <div className="cart-header">
+    <h3>Your Cart</h3>
+    <i
+      className="fa-solid fa-xmark"
+      onClick={() => setCartOpen(false)}
+    ></i>
+  </div>
 
-      <div className="cart-items">
-        {/* Your cart items will go here */}
-      </div>
+  <div className="cart-items">
+    {/* Your cart items will go here */}
+  </div>
 
-      <div className="cart-summary">
-        <p>
-          Subtotal: $<span>0</span>
-        </p>
-        <button className="checkout-btn">Checkout</button>
-      </div>
-    </CartDrawer>
+  <div className="cart-summary">
+    <p>
+      Subtotal: $<span>0</span>
+    </p>
+    <button className="checkout-btn">Checkout</button>
+  </div>
+</Drawer>
+
 
       {/* Search Bar - Shows when searchActive is true */}
       {searchActive && (

@@ -4,18 +4,12 @@
 
 /* Mobile Menu Sidebar */
 .mobile-menu {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 95%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 19;
-  transform: translateX(-100%);
-   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  background: transparent; /* Drawer already has bg */
 }
 
 .mobile-menu.open {

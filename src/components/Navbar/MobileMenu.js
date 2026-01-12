@@ -1,18 +1,12 @@
 import AccordionItem from "./AccordionItem";
-import { createPortal } from "react-dom";
 import "./MobileMenu.css";
 import { Link } from "react-router-dom";
 
-const MobileMenu = ({isOpen, onClose}) => {
-  return createPortal(
+const MobileMenu = ({ onClose }) => {
+  return (
     <>
-     {/* Overlay */}
-      {/* <div
-        className={`nav-overlay ${isOpen ? "show" : ""}`}
-        onClick={onClose}
-      /> */}
 
-        <div className={`mobile-menu ${isOpen ? "open": ""}`}>
+        <div className="mobile-menu">
       {/* Header */}
       <div className="mobile-menu-header">
         <i className="fa-solid fa-xmark" onClick={onClose}></i>
@@ -64,8 +58,7 @@ const MobileMenu = ({isOpen, onClose}) => {
           </div>
       </div>
     </div>
-    </>,
-    document.body
+    </>
 
   );
 }
