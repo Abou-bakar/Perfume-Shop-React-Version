@@ -1,31 +1,52 @@
 import React, { useState } from 'react'
 import './QuantitySelector.css'
 
-const QuantitySelector = () => {
-  const [quantity, setQuantity] = useState(1)
+const QuantitySelector = ({
+  quantity,
+  onIncrease,
+  onDecrease,
+  min = 1,
+  max = 10
+}) => {
+  const handleIncrease = () => {
+    if (quantity < max) {
+      onIncrease()
+    }
+  };
 
-  function handleQuantityIncrease() {
-    if(quantity < 10) {
-    setQuantity(quantity + 1)
-  }
-}
-
-  function handleQuantityDecrease() {
-    if(quantity > 1) {
-    setQuantity(quantity - 1)
-  }
-}
+  const handleDecrease = () => {
+    if (quantity > min) {
+      onDecrease()
+    }
+  };
 
   return (
-    <>
-          <div class="quantity-container">
-            <button class="qty-btn qty-btn--minus" onClick={handleQuantityDecrease}  disabled={quantity <= 1}>&minus;</button>
+    <div className='quantity-container'>
+      <button
+        className='qty-btn qty-btn--minus'
+        onClick={handleDecrease}
+        disabled={quantity <= min}
+      >
+         &minus;
+      </button>
 
-            <input type="number" id="quantity" value={quantity} min="1" max="10" readOnly />
+      <input 
+        type='number'
+        id='quantity'
+        value={quantity}
+        min={min}
+        max={max}
+        readOnly
+      />
 
-            <button class="qty-btn qty-btn--plus" id="increase" onClick={handleQuantityIncrease} disabled={quantity >= 10}>+</button>
-          </div>
-      </>
+      <button
+        className='qty-btn qty-btn--plus'
+        onClick={handleIncrease}
+        disabled={quantity >= max}
+      >
+         +
+      </button>
+    </div>
   )
 }
 

@@ -1,11 +1,11 @@
 import React from 'react'
 import './SortBar.css'
 
-const SortBar = () => {
+const SortBar = ({ sortBy, onSortChange }) => {
   return (
-    <div class="sort-bar">
-          <label for="sort">Sort by:</label>
-          <select name="sort" id="sort">
+    <div className="sort-bar">
+          <label htmlFor="sort">Sort by:</label>
+          <select name="sort" id="sort" value={sortBy} onChange={(e) => onSortChange(e.target.value)}>
             <option value="sale">Default</option>
             <option value="">Sale</option>
             <option value="men">Price: Low to High</option>

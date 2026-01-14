@@ -1,8 +1,8 @@
 .product-carousel {
-    padding: 80px 20px;
-    background: #f7f7f7;
-    text-align: left;
-    overflow: hidden;
+  padding: 80px 20px;
+  background: #f7f7f7;
+  text-align: left;
+  overflow: hidden;
 }
 
 .product-carousel h2 {
@@ -16,13 +16,13 @@
 }
 
 .product-carousel .swiper-slide {
-    box-sizing: border-box;
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
 }
 
 .product-carousel .swiper-pagination {
-    position: relative;
+  position: relative;
   margin-top: 30px;
 }
 

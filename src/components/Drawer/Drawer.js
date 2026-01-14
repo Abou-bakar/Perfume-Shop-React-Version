@@ -10,11 +10,30 @@ const Drawer = ({
     width = "380px",
     children,
 }) => {
-    // 🔒 Lock background scroll
+    // 🔒 Lock background scroll WITHOUT layout shift
     useEffect(() => {
-      document.body.style.overflow = isOpen ? "hidden" : "";
-    
-      return () => (document.body.style.overflow = "")
+      if(isOpen) {
+        // Get scrollbar width before hiding it
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+        // Lock scroll
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      
+      // Compensate for scrollbar width to prevent shift
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+      
+      } else {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+      }
+
+      return () => {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+      }
     }, [isOpen])
     
      return createPortal(

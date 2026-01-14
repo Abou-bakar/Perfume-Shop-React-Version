@@ -5,23 +5,20 @@ import FaqItem from '../Faqtem/FaqItem'
 
 import './ProductDetail.css'
 
-const ProductDetail = () => {
+const ProductDetail = ({product}) => {
   return (
     <div className='product-detail'>
-        <ProductImages />
+        <ProductImages images={product.images || [product.image]} />
 
-        <ProductInfo 
-        title="Haramain L'Aventure Gold, Eau De Parfum"
-        price="Rs. 12.000"
-        salePrice="Rs. 9,000"
+        <ProductInfo
+        product={product} 
+        title={product.title}
+        price={product.isSale ? product.originalPrice : product.price}
+        salePrice={product.isSale ? product.discountedPrice : null}
         />
         <div className="accordion-container">
         <FaqItem question="Description"
-      answer="A scent that embodies passion and elegance in its finest form. It
-              opens with bright notes of orange blossom, pear, and vanilla,
-              unfolds into a heart of pink pepper, jasmine, and almond, and
-              settles into a warm, captivating base of cashmere wood, cedarwood,
-              and patchouli."/>
+      answer={product.description || "A premium fragrance that embodies elegance and sophistication."}/>
 
         <FaqItem question="How to Use?"
       answer=" <strong>Spray on Pulse Points:</strong> Apply on wrists, neck,

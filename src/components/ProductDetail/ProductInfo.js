@@ -2,10 +2,21 @@ import React, { useState } from "react";
 
 import "./ProductInfo.css";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
+import { useCart } from "../../context/CartContext";
+import { toast } from "react-toastify";
 
-const ProductInfo = ({ title, price, salePrice }) => {
+const ProductInfo = ({ product, title, price, salePrice }) => {
+  const { addToCart } = useCart();
   const sizes = ["50ml", "100ml", "200ml"];
   const [selectedSize, setSelectedSize] = useState(sizes[0])
+  const [quantity, setQuantity] = useState(1)
+
+  const handleAddToCart = () => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product)
+    }
+     toast.success(`${title} added to cart`);
+  }
 
   return (
     <div className="product-info">
@@ -17,8 +28,8 @@ const ProductInfo = ({ title, price, salePrice }) => {
       </div>
 
       <div className="sale">
-        <h3 id="product-price">{price}</h3>
-        <h3 id="product-price-sale">{salePrice}</h3>
+        <h3 id="product-price" style={salePrice ? { textDecoration: 'line-through', color: '#999' } : {}}>Rs. {price.toLocaleString("en-PK")}</h3>
+        {salePrice && <h3 id="product-price-sale">{salePrice}</h3>}
       </div>
 
       <div className="size">
@@ -41,8 +52,15 @@ const ProductInfo = ({ title, price, salePrice }) => {
 
       {/* Quantity + Cart */}
       <div className="qty-cart">
-        <QuantitySelector />
-        <button className="add-to-cart-detail">Add to Cart</button>
+        <QuantitySelector 
+         quantity={quantity}
+        onIncrease = {()=> setQuantity(quantity + 1)}
+        onDecrease = {()=> setQuantity(quantity - 1)}
+        min={1}
+        max={10}
+        />
+       
+        <button className="add-to-cart-detail" onClick={handleAddToCart}>Add to Cart</button>
       </div>
 
       <button className="buy-btn">Buy Now</button>

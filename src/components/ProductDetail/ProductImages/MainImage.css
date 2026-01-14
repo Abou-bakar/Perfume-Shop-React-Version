@@ -1,6 +1,10 @@
 .main-image img {
-  width: 400px;
-  height: 400px;
-  object-fit: cover;
-  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #f9f9f9;
 }

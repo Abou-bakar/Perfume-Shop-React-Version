@@ -6,8 +6,11 @@ import { Link, NavLink } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import Drawer from "../Drawer/Drawer";
+import { useCart } from "../../context/CartContext";
+import QuantitySelector from "../QuantitySelector/QuantitySelector";
 
 const Navbar = () => {
+  const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartCount } = useCart();
   const [searchActive, setSearchActive] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -60,7 +63,7 @@ const Navbar = () => {
           <ul>
             <li>
               <NavLink
-                to="/products"
+                to="/men"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 Men
@@ -68,7 +71,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink
-                to="/products"
+                to="/women"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 Women
@@ -122,7 +125,7 @@ const Navbar = () => {
   width="380px"
 >
   <div className="cart-header">
-    <h3>Your Cart</h3>
+    <h3>Your Cart ({getCartCount()})</h3>
     <i
       className="fa-solid fa-xmark"
       onClick={() => setCartOpen(false)}
@@ -130,12 +133,39 @@ const Navbar = () => {
   </div>
 
   <div className="cart-items">
-    {/* Your cart items will go here */}
+   {cartItems.length === 0 ? (
+    <p  style={{ textAlign: 'center', padding: '20px', color: '#666' }}>Your Cart is empty</p>
+   ) : (
+    cartItems.map((item) => (
+      <div key={item.id} className="cart-item">
+        <img src={item.image} alt={item.title} />
+        <div className="item-details">
+          <h4>{item.title}</h4>
+          <p className="item-price">{item.isSale ? item.discountedPrice : item.price}</p>
+          <div style={{ transform: 'scale(0.8)', transformOrigin: 'left' }}>
+          <QuantitySelector
+        quantity={item.quantity}
+        onIncrease={() => updateQuantity(item.id, item.quantity + 1)}
+        onDecrease={() => updateQuantity(item.id, item.quantity - 1)}
+        min={1}
+        max={10}
+      />
+      </div>
+        </div>
+
+        <button
+          className="remove-item"
+            onClick={()=> removeFromCart(item.id)}
+        ><i className="fa-solid fa-trash"></i>
+        </button>
+        </div>
+    ))
+    )}
   </div>
 
   <div className="cart-summary">
     <p>
-      Subtotal: $<span>0</span>
+      Subtotal: Rs. {getCartTotal().toLocaleString("en-PK")}
     </p>
     <button className="checkout-btn">Checkout</button>
   </div>

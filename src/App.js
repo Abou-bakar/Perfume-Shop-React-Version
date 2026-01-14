@@ -8,13 +8,15 @@ import Contact from './pages/Contact';
 import Error from './pages/Error';
 import FAQ from './pages/FAQ';
 import OrderConfirmation from './pages/OrderConfirmation';
-import Products from './pages/Products';
+import Men from './pages/Men';
+import Women from './pages/Women';
 import Sale from './pages/Sale';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
 import ProductDetails from './pages/ProductDetails';
 import MainLayout from './layouts/MainLayout';
 import MinimalLayout from './layouts/MinimalLayout';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   const location = useLocation();
@@ -24,6 +26,7 @@ function App() {
 
    const hideBottomTab = hideBottomTabRoutes.includes(location.pathname)
   return (
+    <CartProvider>
     <Routes>
 
       {/* User pages */}
@@ -32,8 +35,9 @@ function App() {
       <Route path='/about' element={<About />} />
       <Route path='/contact' element={<Contact />} />
       <Route path='/faq' element={<FAQ />} />
-      <Route path='/products' element={<Products />} />
-      <Route path='/product-details' element={<ProductDetails />} />
+      <Route path='/men' element={<Men />} />
+      <Route path='/women' element={<Women />} />
+      <Route path='/product/:id' element={<ProductDetails />} />
       <Route path='/sale' element={<Sale />} />
       </Route>
 
@@ -49,6 +53,7 @@ function App() {
       <Route path='*' element={<Error />} />
       
     </Routes>
+    </CartProvider>
   )
 }
 

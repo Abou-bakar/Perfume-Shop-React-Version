@@ -38,12 +38,17 @@ const ProductCarousel = ({
             }}
             >
 
-            {products.map((product, index) => (
-                <SwiperSlide key={index}>
+            {products.map((product) => (
+                <SwiperSlide key={product.id}>
                     <ProductCard 
+                    id={product.id} 
                     image={product.image}
                     title={product.title}
                     price={product.price}
+                     isSale={product.isSale}
+                    salePercent={product.salePercent}
+                    originalPrice={product.originalPrice}
+                    discountedPrice={product.discountedPrice}
                     />
                 </SwiperSlide>
             ))}

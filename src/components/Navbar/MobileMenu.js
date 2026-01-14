@@ -14,16 +14,16 @@ const MobileMenu = ({ onClose }) => {
 
     {/* Men */}
       <AccordionItem title="Men">
-        <Link to="/">Perfumes</Link>
-        <Link to="/">Perfume Oils</Link>
-        <Link to="/">Deodorants</Link>
+        <Link to="/men">Perfumes</Link>
+        <Link to="/men">Perfume Oils</Link>
+        <Link to="/men">Deodorants</Link>
       </AccordionItem>
 
     {/* Women */}
       <AccordionItem title="Women">
-        <Link to="/">Perfumes</Link>
-        <Link to="/">Mists</Link>
-        <Link to="/">Deodorants</Link>
+        <Link to="/women">Perfumes</Link>
+        <Link to="/women">Mists</Link>
+        <Link to="/women">Deodorants</Link>
       </AccordionItem>
 
     {/* Sale */}
