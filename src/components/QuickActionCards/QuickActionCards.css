@@ -1,3 +1,8 @@
+.quick-action-card {
+  text-decoration: none;
+  color: black;
+}
+
 .cards-container {
   display: flex;
   gap: 30px;

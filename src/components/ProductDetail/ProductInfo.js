@@ -5,7 +5,7 @@ import QuantitySelector from "../QuantitySelector/QuantitySelector";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
 
-const ProductInfo = ({ product, title, price, salePrice }) => {
+const ProductInfo = ({ product, productName, price, salePrice }) => {
   const { addToCart } = useCart();
   const sizes = ["50ml", "100ml", "200ml"];
   const [selectedSize, setSelectedSize] = useState(sizes[0])
@@ -15,12 +15,12 @@ const ProductInfo = ({ product, title, price, salePrice }) => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product)
     }
-     toast.success(`${title} added to cart`);
+     toast.success(`${productName} added to cart`);
   }
 
   return (
     <div className="product-info">
-      <h1>{title}</h1>
+      <h1>{productName}</h1>
 
       <div className="delivery">
         <i className="fa-solid fa-truck-fast"></i>

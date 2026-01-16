@@ -173,8 +173,8 @@ const Navbar = () => {
 
 
       {/* Search Bar - Shows when searchActive is true */}
-      {searchActive && (
-        <div className="search-container">
+      
+        <div className={`search-container ${searchActive ? "active" : ""}`}>
           <div ref={searchRef} className="search-box">
             <i className="fa-solid fa-magnifying-glass"></i>
             <input type="text" placeholder="Search Products..." autoFocus />
@@ -186,7 +186,7 @@ const Navbar = () => {
             </button>
           </div>
         </div>
-      )}
+     
     </>
   );
 };

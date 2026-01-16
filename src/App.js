@@ -17,6 +17,8 @@ import ProductDetails from './pages/ProductDetails';
 import MainLayout from './layouts/MainLayout';
 import MinimalLayout from './layouts/MinimalLayout';
 import { CartProvider } from './context/CartContext';
+import AllProducts from './pages/AllProducts';
+import AddProduct from './pages/AddProduct';
 
 function App() {
   const location = useLocation();
@@ -35,6 +37,7 @@ function App() {
       <Route path='/about' element={<About />} />
       <Route path='/contact' element={<Contact />} />
       <Route path='/faq' element={<FAQ />} />
+      <Route path='/products' element={<AllProducts />} />
       <Route path='/men' element={<Men />} />
       <Route path='/women' element={<Women />} />
       <Route path='/product/:id' element={<ProductDetails />} />
@@ -43,6 +46,7 @@ function App() {
 
       {/* Minimal pages */}
        <Route element={<MinimalLayout />}>
+       <Route path='/add-product' element={<AddProduct />} />
       <Route path='/checkout' element={<Checkout />} />
       <Route path='/order-confirmation' element={<OrderConfirmation />} />
       <Route path='/login' element={<Login />} />

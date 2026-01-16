@@ -4,10 +4,40 @@ import { useCart } from '../../context/CartContext'
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 
+const ProductCard = ( {id, image, productName, price, isSale, salePercent, originalPrice, discountedPrice}) => {
 
-const ProductCard = ( {id, image, title, price, isSale, salePercent, originalPrice, discountedPrice}) => {
+   console.log('Product:', productName, {
+    isSale,
+    originalPrice,
+    discountedPrice,
+    price
+  });
+  
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+const formatPrice = (price) => {
+  if (!price) return "0";
+  
+  // If it's a number, format it
+  if (typeof price === 'number') {
+    return price.toLocaleString("en-PK");
+  }
+  
+  // If it's a string, convert to number first, then format
+  if (typeof price === 'string') {
+    // Remove any commas and spaces, then convert to number
+    const numPrice = parseInt(price.replace(/[,\s]/g, ''));
+    if (!isNaN(numPrice)) {
+      return numPrice.toLocaleString("en-PK");
+    }
+    // If it already has commas formatted nicely, just return it
+    return price;
+  }
+  
+  return "0";
+}
+
 
   const handleAddToCart = (e) => {
      e.stopPropagation(); // Prevent card click when clicking the + button
@@ -21,7 +51,7 @@ const ProductCard = ( {id, image, title, price, isSale, salePercent, originalPri
     const product = {
     id,
     image,
-    title,
+    productName,
     price,
     isSale,
     salePercent,
@@ -32,7 +62,7 @@ const ProductCard = ( {id, image, title, price, isSale, salePercent, originalPri
   addToCart(product);
 
   // Optional: Show feedback to user
-       toast.success(`${title} added to cart`);
+       toast.success(`${productName} added to cart`);
 };
 
   const handleCardClick = () => {
@@ -44,7 +74,7 @@ const ProductCard = ( {id, image, title, price, isSale, salePercent, originalPri
         <div className="product-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
            {/* Image + Sale tag */}
            <div className="image-sale">
-            <img src={image} alt={title} />
+            <img src={image} alt={productName} />
 
             {isSale && (
             <span className="sale-tag">{salePercent}% OFF</span>
@@ -53,14 +83,14 @@ const ProductCard = ( {id, image, title, price, isSale, salePercent, originalPri
 
             <div className="product-info">
             <div className="product-details">
-                <h3>{title}</h3>
+                <h3>{productName}</h3>
 
                 {/* Price */}
-                {!isSale && <p className="price"> Rs. {price.toLocaleString("en-PK")}</p>}
+                {!isSale && <p className="price"> Rs. {formatPrice(price)}</p>}
                 {isSale && (
                   <div className="price">
-                <span className="original">Rs. {originalPrice.toLocaleString("en-PK")}</span>
-                <span className="discounted">Rs. {discountedPrice.toLocaleString("en-PK")}</span>
+                <span className="original">Rs. {formatPrice(originalPrice)}</span>
+                <span className="discounted">Rs. {formatPrice(discountedPrice)}</span>
               </div>
                 )}
             </div>

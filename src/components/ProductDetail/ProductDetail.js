@@ -12,7 +12,7 @@ const ProductDetail = ({product}) => {
 
         <ProductInfo
         product={product} 
-        title={product.title}
+        productName={product.productName}
         price={product.isSale ? product.originalPrice : product.price}
         salePrice={product.isSale ? product.discountedPrice : null}
         />

@@ -43,7 +43,7 @@ const ProductCarousel = ({
                     <ProductCard 
                     id={product.id} 
                     image={product.image}
-                    title={product.title}
+                    productName={product.productName}
                     price={product.price}
                      isSale={product.isSale}
                     salePercent={product.salePercent}

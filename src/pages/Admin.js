@@ -7,6 +7,7 @@ import logo from "../assets/images/logo.png";
 import product1 from '../assets/images/product1.png';
 import product2 from '../assets/images/product2.png';
 import product3 from '../assets/images/product3.png';
+import { Link } from 'react-router-dom';
 
 const Admin = () => {
   return (
@@ -22,14 +23,14 @@ const Admin = () => {
         </span>
 
         <nav className="admin-menu">
-          <a href="">Dashboard</a>
-          <a href="">Add Product</a>
-          <a href="">Manage Prodcuts</a>
-          <a href="">Categories</a>
-          <a href="">Sales</a>
-          <a href="">Orders</a>
-          <a href="">Customers</a>
-          <a href="">Settings</a>
+          <Link to="/admin">Dashboard</Link>
+          <Link to="/add-product">Add Product</Link>
+          <Link to="/manage-products">Manage Products</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/sales">Sales</Link>
+          <Link to="/orders">Orders</Link>
+          <Link to="/customers">Customers</Link>
+          <Link to="/settings">Settings</Link>
         </nav>
       </aside>
 
@@ -62,7 +63,7 @@ const Admin = () => {
          <section className="admin-section">
           <h1>Quick Actions</h1>
           <div className='cards-container'>
-          <QuickActionCards quickaction="Add Product" variant="card1" />
+          <QuickActionCards quickaction="Add Product" variant="card1"  link="/add-product" />
           <QuickActionCards quickaction="Manage Products" variant="card2" />
             <QuickActionCards quickaction="Add Sales" variant="card3" />
             <QuickActionCards quickaction="Create Category" variant="card4" />

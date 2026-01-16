@@ -1,28 +1,56 @@
 import FilterBar from '../components/FilterBar/FilterBar'
 import SortBar from '../components/SortBar/SortBar'
 import ProductCard from '../components/Product/ProductCard'
-import { womenProducts } from '../data/products';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import Loader from '../components/Loader/Loader';
 
 const Women = () => {
   const [sortBy, setSortBy] = useState('default');
+   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch women's products from Firestore
+  useEffect(() => {
+     const fetchMenProducts = async () => {
+   try {
+    setLoading(true)
+    // Query only products where "for" field is "men"
+    const q = query(collection(db, "products"), where("for", "==", "women"));
+    const querySnapshot = await getDocs(q);
+    const productsData = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+    setProducts(productsData)
+   } catch (error) {
+    console.error("Error fetching men's products:", error);
+   } finally {
+    setLoading(false)
+   }
+  };
+
+  fetchMenProducts();
+  }, [])
+
+  // Sort products
   const sortedProducts = useMemo(() => {
-    let products = [...womenProducts];
+    let filteredProducts = [...products];
 
     switch (sortBy) {
       case 'sale':
-        products = products.filter(product => product.isSale);
+        filteredProducts = filteredProducts.filter(product => product.isSale);
         break;
       case 'price-low-high':
-        products.sort((a, b) => {
+        filteredProducts.sort((a, b) => {
           const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''));
           const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''));
           return priceA - priceB;
         });
         break;
       case 'price-high-low':
-        products.sort((a, b) => {
+        filteredProducts.sort((a, b) => {
           const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''));
           const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''));
           return priceB - priceA;
@@ -32,15 +60,17 @@ const Women = () => {
         break;
     }
 
-    return products;
-  }, [sortBy]);
+    return filteredProducts;
+  }, [products, sortBy]);
+
+  if (loading) {
+    return <Loader />
+  }
 
   return (
     <section className='product-container'>
       <div className='product-controls'>
-        <div style={{ visibility: 'hidden' }}>
-          <FilterBar selectedCategory="women" onCategoryChange={() => {}} />
-        </div>
+          <FilterBar selectedCategory="women" onCategoryChange={() => {}} disabled={true} />
         <SortBar 
           sortBy={sortBy}
           onSortChange={setSortBy}

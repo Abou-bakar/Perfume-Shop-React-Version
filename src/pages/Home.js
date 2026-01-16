@@ -11,7 +11,7 @@ const Home = () => {
     <>
     <Hero />
     <MobileCategories />
-    <TopSellers heading="Top Sellers" />
+    <TopSellers />
     <ImageGallery />
     <TopDeals />
     <Landscape />
