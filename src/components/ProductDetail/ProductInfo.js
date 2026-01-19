@@ -29,7 +29,7 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
 
       <div className="sale">
         <h3 id="product-price" style={salePrice ? { textDecoration: 'line-through', color: '#999' } : {}}>Rs. {price.toLocaleString("en-PK")}</h3>
-        {salePrice && <h3 id="product-price-sale">{salePrice}</h3>}
+        {salePrice && <h3 id="product-price-sale">Rs. {salePrice.toLocaleString("en-PK")}</h3>}
       </div>
 
       <div className="size">

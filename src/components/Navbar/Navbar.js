@@ -138,9 +138,9 @@ const Navbar = () => {
    ) : (
     cartItems.map((item) => (
       <div key={item.id} className="cart-item">
-        <img src={item.image} alt={item.title} />
+        <img src={item.image} alt={item.productName} />
         <div className="item-details">
-          <h4>{item.title}</h4>
+          <h4>{item.productName}</h4>
           <p className="item-price">{item.isSale ? item.discountedPrice : item.price}</p>
           <div style={{ transform: 'scale(0.8)', transformOrigin: 'left' }}>
           <QuantitySelector

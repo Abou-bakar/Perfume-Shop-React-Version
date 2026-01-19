@@ -2,27 +2,59 @@ import ProductCard from '../components/Product/ProductCard'
 import FilterBar from '../components/FilterBar/FilterBar'
 import SortBar from '../components/SortBar/SortBar'
 import '../styles/products.css'
-import { saleProducts } from '../data/products';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import Loader from '../components/Loader/Loader';
 
 const Sale = () => {
   const [sortBy, setSortBy] = useState('default');
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch sale products from Firestore
+  useEffect(() => {
+    const fetchSaleProducts = async () => {
+      try {
+        setLoading(true);
+        // Query only products where "isSale" is true
+         const querySnapshot = await getDocs(collection(db, "products"));
+      const productsData = querySnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(product => product.isSale === true); // Filter after fetching
+      
+      console.log("Sale products fetched:", productsData);
+      setProducts(productsData);
+    } catch (error) {
+      console.error("Error fetching sale products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    fetchSaleProducts()
+   
+  }, [])
+  
 
   const sortedProducts = useMemo(() => {
-    let products = [...saleProducts];
+    let filteredProducts = [...products];
 
     switch (sortBy) {
       case 'price-low-high':
-        products.sort((a, b) => {
-          const priceA = parseFloat((a.discountedPrice || '0').replace(/[Rs.,\s]/g, ''));
-          const priceB = parseFloat((b.discountedPrice || '0').replace(/[Rs.,\s]/g, ''));
+        filteredProducts.sort((a, b) => {
+          const priceA = typeof a.discountedPrice === 'number' ? a.discountedPrice : parseInt(a.discountedPrice || 0);
+          const priceB = typeof b.discountedPrice === 'number' ? b.discountedPrice : parseInt(b.discountedPrice || 0);
           return priceA - priceB;
         });
         break;
       case 'price-high-low':
-        products.sort((a, b) => {
-          const priceA = parseFloat((a.discountedPrice || '0').replace(/[Rs.,\s]/g, ''));
-          const priceB = parseFloat((b.discountedPrice || '0').replace(/[Rs.,\s]/g, ''));
+        filteredProducts.sort((a, b) => {
+          const priceA = typeof a.discountedPrice === 'number' ? a.discountedPrice : parseInt(a.discountedPrice || 0);
+          const priceB = typeof b.discountedPrice === 'number' ? b.discountedPrice : parseInt(b.discountedPrice || 0);
           return priceB - priceA;
         });
         break;
@@ -30,8 +62,12 @@ const Sale = () => {
         break;
     }
 
-    return products;
-  }, [sortBy]);
+    return filteredProducts;
+  }, [products, sortBy]);
+
+  if (loading) {
+    return <Loader />
+  }
 
   return (
     <section className='product-container'>

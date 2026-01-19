@@ -1,3 +1,4 @@
+import { type } from 'firebase/firestore/pipelines';
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 // Create Cart Context
@@ -64,16 +65,24 @@ export const CartProvider = ({children}) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => {
-        const priceString = item.isSale ? item.discountedPrice : item.price;
+     return cartItems.reduce((total, item) => {
+  const priceValue = item.isSale ? item.discountedPrice : item.price;
 
-         const price = parseFloat(priceString.replace(/[Rs.,\s]/g, ''));
-        const quantity = Number(item.quantity) || 1;
+   let price;
+   if (typeof priceValue === 'number') {
+    price = priceValue;
+   } else if (typeof priceValue === 'string') {
+    price = parseFloat(priceValue.replace(/[Rs.,\s]/g, ''));
+   } else {
+    return total;
+   }
 
-        if (isNaN(price)) return total;
+    const quantity = Number(item.quantity) || 1;
 
-        return total + price * item.quantity;
-    }, 0)
+            if (isNaN(price)) return total;
+
+            return total + price * quantity;
+        }, 0)
   }
 
   const getCartCount = () => {

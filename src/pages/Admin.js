@@ -64,7 +64,7 @@ const Admin = () => {
           <h1>Quick Actions</h1>
           <div className='cards-container'>
           <QuickActionCards quickaction="Add Product" variant="card1"  link="/add-product" />
-          <QuickActionCards quickaction="Manage Products" variant="card2" />
+          <QuickActionCards quickaction="Manage Products" variant="card2" link="/manage-products" />
             <QuickActionCards quickaction="Add Sales" variant="card3" />
             <QuickActionCards quickaction="Create Category" variant="card4" />
             </div>

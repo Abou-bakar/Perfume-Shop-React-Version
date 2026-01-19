@@ -19,45 +19,60 @@ import MinimalLayout from './layouts/MinimalLayout';
 import { CartProvider } from './context/CartContext';
 import AllProducts from './pages/AllProducts';
 import AddProduct from './pages/AddProduct';
+import ManageProducts from './pages/ManageProducts';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const location = useLocation();
 
-   // Pages where BottomTab should NOT appear
-   const hideBottomTabRoutes = ['/admin', '/login', '/checkout', '/order-confirmation']
+  // Pages where BottomTab should NOT appear
+  const hideBottomTabRoutes = ['/admin', '/login', '/checkout', '/order-confirmation']
 
-   const hideBottomTab = hideBottomTabRoutes.includes(location.pathname)
+  const hideBottomTab = hideBottomTabRoutes.includes(location.pathname)
   return (
-    <CartProvider>
-    <Routes>
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
+      <CartProvider>
+        <Routes>
 
-      {/* User pages */}
-       <Route element={<MainLayout />}>
-      <Route path='/' element={<Home />} />
-      <Route path='/about' element={<About />} />
-      <Route path='/contact' element={<Contact />} />
-      <Route path='/faq' element={<FAQ />} />
-      <Route path='/products' element={<AllProducts />} />
-      <Route path='/men' element={<Men />} />
-      <Route path='/women' element={<Women />} />
-      <Route path='/product/:id' element={<ProductDetails />} />
-      <Route path='/sale' element={<Sale />} />
-      </Route>
+          {/* User pages */}
+          <Route element={<MainLayout />}>
+            <Route path='/' element={<Home />} />
+            <Route path='/about' element={<About />} />
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/faq' element={<FAQ />} />
+            <Route path='/products' element={<AllProducts />} />
+            <Route path='/men' element={<Men />} />
+            <Route path='/women' element={<Women />} />
+            <Route path='/product/:id' element={<ProductDetails />} />
+            <Route path='/sale' element={<Sale />} />
+          </Route>
 
-      {/* Minimal pages */}
-       <Route element={<MinimalLayout />}>
-       <Route path='/add-product' element={<AddProduct />} />
-      <Route path='/checkout' element={<Checkout />} />
-      <Route path='/order-confirmation' element={<OrderConfirmation />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/admin' element={<Admin />} />
-      </Route>
+          {/* Minimal pages */}
+          <Route element={<MinimalLayout />}>
+            <Route path='/add-product' element={<AddProduct />} />
+            <Route path='/manage-products' element={<ManageProducts />} />
+            <Route path='/checkout' element={<Checkout />} />
+            <Route path='/order-confirmation' element={<OrderConfirmation />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/admin' element={<Admin />} />
+          </Route>
 
-      {/* 404 Page */}
-      <Route path='*' element={<Error />} />
-      
-    </Routes>
-    </CartProvider>
+          {/* 404 Page */}
+          <Route path='*' element={<Error />} />
+
+        </Routes>
+      </CartProvider>
+    </>
   )
 }
 

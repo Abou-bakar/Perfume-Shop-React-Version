@@ -48,15 +48,15 @@ const Men = () => {
         break;
       case 'price-low-high':
         filteredProducts.sort((a, b) => {
-          const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''));
-          const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''));
+          const priceA = typeof a.price === 'number' ? a.price : parseInt(a.price || 0);
+          const priceB = typeof b.price === 'number' ? b.price : parseInt(b.price || 0);
           return priceA - priceB;
         });
         break;
       case 'price-high-low':
         filteredProducts.sort((a, b) => {
-          const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''));
-          const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''));
+          const priceA = typeof a.price === 'number' ? a.price : parseInt(a.price || 0);
+          const priceB = typeof b.price === 'number' ? b.price : parseInt(b.price || 0);
           return priceB - priceA;
         });
         break;

@@ -10,6 +10,7 @@ const SortBar = ({ sortBy, onSortChange }) => {
             <option value="default">Default</option>
             <option value="price-low-high">Price: Low to High</option>
             <option value="price-high-low">Price: High to Low</option>
+            <option value="sale">Sale</option>
             <option value="best-selling">Best Selling</option>
           </select>
         </div>
