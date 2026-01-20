@@ -4,7 +4,8 @@ import ProductCard from '../components/Product/ProductCard'
 import { useMemo, useState, useEffect } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import Loader from '../components/Loader/Loader';
+import ProductCardSkeleton from '../components/ProductSkeleton/ProductCardSkeleton';
+import { motion } from "framer-motion";
 
 const Women = () => {
   const [sortBy, setSortBy] = useState('default');
@@ -16,7 +17,7 @@ const Women = () => {
      const fetchMenProducts = async () => {
    try {
     setLoading(true)
-    // Query only products where "for" field is "men"
+    // Query only products where "for" field is "women"
     const q = query(collection(db, "products"), where("for", "==", "women"));
     const querySnapshot = await getDocs(q);
     const productsData = querySnapshot.docs.map(doc => ({
@@ -63,8 +64,20 @@ const Women = () => {
     return filteredProducts;
   }, [products, sortBy]);
 
-  if (loading) {
-    return <Loader />
+  if (loading) {return (
+    <section className="product-container">
+      <div className="product-controls">
+        <FilterBar selectedCategory="" onCategoryChange={() => {}} disabled />
+        <SortBar sortBy={sortBy} onSortChange={setSortBy} />
+      </div>
+
+      <div className="product-grid">
+        {[...Array(8)].map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
+      </div>
+    </section>
+  );
   }
 
   return (
@@ -77,18 +90,16 @@ const Women = () => {
         />
       </div>
       <div className='product-grid'>
-        {sortedProducts.length === 0 ? (
-          <p style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#666' }}>
-            No products found
-          </p>
-        ) : (
-          sortedProducts.map((product) => (
-            <ProductCard 
-              key={product.id}
-              {...product}
-            />
-          ))
-        )}
+        {sortedProducts.map(product => (
+  <motion.div
+    key={product.id}
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    <ProductCard {...product} />
+  </motion.div>
+))}
       </div>
     </section>
   )

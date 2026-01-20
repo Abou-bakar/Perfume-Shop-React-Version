@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import '../styles/addproduct.css';
+import { Link } from 'react-router-dom';
+import logo from "../assets/images/logo.png";
 
 const AddProduct = () => {
     const [formData, setFormData] = useState({
@@ -9,7 +11,7 @@ const AddProduct = () => {
         price: '',
         category: 'fragrance',
         for: 'men',
-        image: '',
+        images: [''],
         isSale: false,
         discountedPrice: '',
         originalPrice: '',
@@ -20,6 +22,27 @@ const AddProduct = () => {
 
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState('')
+
+    const handleAddImage = () => {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, '']
+      }))
+    }
+
+    const handleRemoveImage = (index) => {
+      setFormData(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }))
+    }
+
+    const handleImageChange = (index, value) => {
+      setFormData(prev => ({
+        ...prev,
+        images: prev.images.map((img, i) => i === index ? value : img)
+      }))
+    }
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -41,7 +64,7 @@ const AddProduct = () => {
                 price: parseInt(formData.price),
                 category: formData.category,
                 for: formData.for,
-                image: formData.image,
+                images: formData.images.filter(img => img.trim() !== ''),
                 isSale: formData.isSale,
                 description: formData.description || '',
                 stock: formData.stock ? parseInt(formData.stock) : 0,
@@ -71,7 +94,7 @@ const AddProduct = () => {
                 price: '',
                 category: 'fragrance',
                 for: 'men',
-                image: '',
+                images: [''],
                 isSale: false,
                 discountedPrice: '',
                 originalPrice: '',
@@ -92,10 +115,34 @@ const AddProduct = () => {
         }
 
   return (
+    <>
+    <div className="admin-layout">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <span className="logo">
+          <img src={logo} alt="" />
+          <h1>
+            Perfumes<br />
+            Mists
+          </h1>
+        </span>
+
+        <nav className="admin-menu">
+          <Link to="/admin">Dashboard</Link>
+          <Link to="/add-product">Add Product</Link>
+          <Link to="/manage-products">Manage Products</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/sales">Sales</Link>
+          <Link to="/orders">Orders</Link>
+          <Link to="/customers">Customers</Link>
+          <Link to="/settings">Settings</Link>
+        </nav>
+      </aside>
+
+       {/* Main Content */}
   <div className="addproduct-container">
       <div className="addproduct-header">
         <h1>Add New Product</h1>
-        <a href="/admin" className="back-btn">← Back to Dashboard</a>
       </div>
       
       {message && (
@@ -159,7 +206,7 @@ const AddProduct = () => {
             <input
               type="url"
               name="image"
-              value={formData.image}
+              value={formData.images}
               onChange={handleChange}
               required
               placeholder="https://example.com/image.jpg"
@@ -167,9 +214,9 @@ const AddProduct = () => {
             <small style={{color: '#666', fontSize: '12px'}}>
               Tip: Upload to <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer">ImgBB</a> and paste the direct image link
             </small>
-            {formData.image && (
+            {formData.images && (
               <img 
-                src={formData.image} 
+                src={formData.images} 
                 alt="Preview" 
                 className="image-preview"
                 onError={(e) => e.target.style.display = 'none'}
@@ -199,6 +246,49 @@ const AddProduct = () => {
             />
           </div>
         </div>
+
+        <div className="form-section">
+    <h2>Product Images</h2>
+    {formData.images.map((image, index) => (
+        <div key={index} className="form-group">
+            <label>Image {index + 1} {index === 0 && '*'}</label>
+            <div style={{display: 'flex', gap: '10px'}}>
+                <input
+                    type="url"
+                    value={image}
+                    onChange={(e) => handleImageChange(index, e.target.value)}
+                    required={index === 0}
+                    placeholder="https://example.com/image.jpg"
+                    style={{flex: 1}}
+                />
+                {index > 0 && (
+                    <button 
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="remove-img-btn"
+                    >
+                        Remove
+                    </button>
+                )}
+            </div>
+            {image && (
+                <img 
+                    src={image} 
+                    alt={`Preview ${index + 1}`}
+                    className="image-preview"
+                    onError={(e) => e.target.style.display = 'none'}
+                />
+            )}
+        </div>
+    ))}
+    <button 
+        type="button"
+        onClick={handleAddImage}
+        className="add-img-btn"
+    >
+        + Add Another Image
+    </button>
+</div>
 
         {/* Sale Info */}
         <div className="form-section">
@@ -264,6 +354,8 @@ const AddProduct = () => {
         </button>
       </form>
     </div>
+    </div>
+    </>
   )
 }
 

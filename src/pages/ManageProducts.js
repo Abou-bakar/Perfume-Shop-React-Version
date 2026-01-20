@@ -4,10 +4,9 @@ import { db } from '../config/firebase';
 import '../styles/manageproducts.css';
 import Loader from '../components/Loader/Loader';
 import { Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
-
+import logo from "../assets/images/logo.png";
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([])
@@ -70,7 +69,7 @@ const ManageProducts = () => {
                 price: parseInt(editingProduct.price),
                 category: editingProduct.category,
                 for: editingProduct.for,
-                image: editingProduct.image,
+                images: editingProduct.images,
                 stock: parseInt(editingProduct.stock) || 0,
                 description: editingProduct.description || '',
                 isSale: editingProduct.isSale
@@ -118,10 +117,32 @@ const ManageProducts = () => {
     }
 
     return (
+         <div className="admin-layout">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <span className="logo">
+          <img src={logo} alt="" />
+          <h1>
+            Perfumes<br />
+            Mists
+          </h1>
+        </span>
+
+        <nav className="admin-menu">
+          <Link to="/admin">Dashboard</Link>
+          <Link to="/add-product">Add Product</Link>
+          <Link to="/manage-products">Manage Products</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/sales">Sales</Link>
+          <Link to="/orders">Orders</Link>
+          <Link to="/customers">Customers</Link>
+          <Link to="/settings">Settings</Link>
+        </nav>
+      </aside>
+      
         <div className='manage-container'>
             <div className='manage-header'>
                 <h1>Manage Products</h1>
-                <Link to='/admin' className='back-btn'>← Back to Dashboard</Link>
             </div>
 
             {/* Search and Filter */}
@@ -174,7 +195,7 @@ const ManageProducts = () => {
                                 <tr key={product.id}>
                                     <td>
                                         <img
-                                            src={product.image}
+                                            src={product.images}
                                             alt={product.productName}
                                             className='product-thumbnail'
                                         />
@@ -220,7 +241,7 @@ const ManageProducts = () => {
                     <div className='modal-content' onClick={(e) => e.stopPropagation()}>
                         <div className='modal-header'>
                             <h2>Edit Product</h2>
-                            <button className='close-btn' onClick={handleCancelEdit}>x</button>
+                            <button className='close-btn' onClick={handleCancelEdit}><i class="fa-solid fa-x"></i></button>
                         </div>
 
                         <div className='modal-body'>
@@ -284,7 +305,7 @@ const ManageProducts = () => {
                                 <label>Image URL</label>
                                 <input
                                     type='url'
-                                    value={editingProduct.image}
+                                    value={editingProduct.images}
                                     onChange={(e) => handleInputChange('image', e.target.value)}
                                 />
                             </div>
@@ -356,6 +377,7 @@ const ManageProducts = () => {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     )
 }

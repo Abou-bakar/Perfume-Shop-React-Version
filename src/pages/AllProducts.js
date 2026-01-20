@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import ProductCard from '../components/Product/ProductCard';
-// import { allProductsArray } from '../data/products';
 import '../styles/products.css';
 import FilterBar from '../components/FilterBar/FilterBar';
 import SortBar from '../components/SortBar/SortBar';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import Loader from '../components/Loader/Loader';
+import ProductCardSkeleton from '../components/ProductSkeleton/ProductCardSkeleton';
+import { motion } from "framer-motion";
 
 const AllProducts = () => {
     const [selectedCategory, setSelectedCategory] = useState('')
@@ -52,15 +52,15 @@ fetchProducts()
                 break;
             case 'price-low-high':
                 filteredProducts.sort((a, b) => {
-                    const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''))
-                    const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''))
+                    const priceA = typeof a.price === 'number' ? a.price : parseInt(a.price || 0);
+                    const priceB = typeof b.price === 'number' ? b.price : parseInt(b.price || 0);
                      return priceA - priceB;
                 })
                 break;
                 case 'price-high-low':
                     filteredProducts.sort((a, b) => {
-                    const priceA = parseFloat((a.price || '0').replace(/[Rs.,\s]/g, ''))
-                    const priceB = parseFloat((b.price || '0').replace(/[Rs.,\s]/g, ''))
+                    const priceA = typeof a.price === 'number' ? a.price : parseInt(a.price || 0);
+                    const priceB = typeof b.price === 'number' ? b.price : parseInt(b.price || 0);
                     return priceB - priceA;
                      });
                      break;
@@ -76,7 +76,18 @@ fetchProducts()
     }, [products, selectedCategory, sortBy])
 
     if(loading) {
-      return <Loader />
+      return (
+        <div className="product-grid">
+  {loading
+    ? [...Array(products.length || 12)].map((_, i) => ( // fallback to 12 if array empty
+        <ProductCardSkeleton key={i} />
+      ))
+    : products.map((product) => (
+        <ProductCard key={product.id} {...product} />
+      ))
+  }
+</div>
+      )
     }
 
     return (

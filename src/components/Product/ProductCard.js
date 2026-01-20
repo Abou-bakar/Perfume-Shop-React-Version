@@ -4,7 +4,7 @@ import { useCart } from '../../context/CartContext'
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 
-const ProductCard = ( {id, image, productName, price, isSale, salePercent, originalPrice, discountedPrice}) => {
+const ProductCard = ( {id, images, productName, price, isSale, salePercent, originalPrice, discountedPrice}) => {
 
    console.log('Product:', productName, {
     isSale,
@@ -50,7 +50,7 @@ const formatPrice = (price) => {
     
     const product = {
     id,
-    image,
+    images,
     productName,
     price,
     isSale,
@@ -74,7 +74,7 @@ const formatPrice = (price) => {
         <div className="product-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
            {/* Image + Sale tag */}
            <div className="image-sale">
-            <img src={image} alt={productName} />
+            <img src={images} alt={productName} />
 
             {isSale && (
             <span className="sale-tag">{salePercent}% OFF</span>

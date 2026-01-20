@@ -1,32 +1,27 @@
 .thumbnail-container {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
   justify-content: center;
+  margin-top: 20px;
 }
 
-.thumbnail-container img {
-  width: 90px;
-  height: 90px;
-  border: 2px solid transparent;
+.thumb {
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.3s;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  opacity: 0.6;
 }
 
-.thumbnail-container img:hover {
+.thumb:hover {
+  opacity: 1;
   transform: scale(1.05);
-}
-
-.thumbnail-container img.active {
-  border: 2px solid black;
-}
-
-.thumbnail:hover {
-  transform: scale(1.05);
-  border-color: black;
 }
 
 .thumb.active {
-  border-color: black;
+  border: 3px solid black;
+  opacity: 1;
 }

@@ -1,21 +1,47 @@
+import { useState, useEffect } from 'react';
 import ProductCarousel from "../ProductCarousel/ProductCarousel";
-import { topSellersProducts } from "../../data/products";
+import { collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 
 const TopSellers = () => {
-  // Create duplicates with unique IDs
-  const duplicatedProducts = [
-    ...topSellersProducts,
-    ...topSellersProducts.map((product) => ({
-      ...product,
-      id: `${product.id}_duplicate`, // Make IDs unique
-    }))
-  ];
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+   const fetchTopSellers = async () => {
+    try {
+      setLoading(true)
+      const q = query(
+        collection(db, "products"),
+        where("isSale", "==", false),
+        limit(6)
+      );
+      const querySnapshot = await getDocs(q);
+      const productsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setProducts(productsData)
+    } catch (error) {
+       console.error("Error fetching top sellers:", error);
+    } finally {
+      setLoading(false)
+    }
+   }
+
+   fetchTopSellers()
+  }, [])
+
+  if (!loading && products.length === 0) {
+  return null;
+}
 
     return (
   <ProductCarousel 
     heading="Top Sellers"
-    products={duplicatedProducts}
+    products={products}
     paginationClass="sellers-pagination"
+    loading={loading}
   />
     )
 }

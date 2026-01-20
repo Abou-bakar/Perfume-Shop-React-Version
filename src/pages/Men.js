@@ -8,6 +8,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Loader from '../components/Loader/Loader';
+import ProductCardSkeleton from '../components/ProductSkeleton/ProductCardSkeleton';
+import { motion, AnimatePresence } from "framer-motion";
 
 const Men = () => {
   const [sortBy, setSortBy] = useState('default');
@@ -72,8 +74,21 @@ const Men = () => {
   }, [products, sortBy]);
 
   if (loading) {
-    return <Loader />
-  }
+    return (
+    <section className="product-container">
+      <div className="product-controls">
+        <FilterBar selectedCategory="" onCategoryChange={() => {}} disabled />
+        <SortBar sortBy={sortBy} onSortChange={setSortBy} />
+      </div>
+
+      <div className="product-grid">
+        {[...Array(8)].map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
   return (
     <section className='product-container'>
@@ -84,18 +99,16 @@ const Men = () => {
         <SortBar sortBy={sortBy} onSortChange={setSortBy} />
          </div>
       <div className='product-grid'>
-        {sortedProducts.length === 0 ? (
-          <p style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#666' }}>
-            No products found
-          </p>
-        ) : (
-          sortedProducts.map((product) => (
-            <ProductCard 
-              key={product.id}
-              {...product}
-            />
-          ))
-        )}
+        {sortedProducts.map(product => (
+  <motion.div
+    key={product.id}
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    <ProductCard {...product} />
+  </motion.div>
+))}
       </div>
     </section>
   )
