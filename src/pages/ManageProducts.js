@@ -52,7 +52,8 @@ const ManageProducts = () => {
 
     // Start editing
     const handleEdit = (product) => {
-        setEditingProduct({ ...product });
+        const images = Array.isArray(product.images) ? product.images : [product.image || '']
+        setEditingProduct({ ...product, images });
     };
 
     // Cancel editing
@@ -60,16 +61,45 @@ const ManageProducts = () => {
         setEditingProduct(null);
     };
 
+    const handleAddImage = () => {
+        setEditingProduct(prev => ({
+            ...prev,
+            images: [prev.images, '']
+        }))
+    }
+
+    const handleRemoveImage = (index) => {
+        setEditingProduct(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }))
+    }
+    const handleImageChange = (index, value) => {
+        setEditingProduct(prev => ({
+            ...prev,
+            images: prev.images.map((img, i) => i === index ? value : img)
+        }))
+    }
+
     // Save edited product
     const handleSaveEdit = async () => {
         try {
+            // Filter out empty image URLs
+            const validImages = editingProduct.images.filter(img => img.trim() !== '');
+
+            if (validImages.length === 0) {
+                toast.error('Please add at least one product image');
+                return;
+            }
+
             const productRef = doc(db, "products", editingProduct.id);
             const updateData = {
                 productName: editingProduct.productName,
                 price: parseInt(editingProduct.price),
                 category: editingProduct.category,
                 for: editingProduct.for,
-                images: editingProduct.images,
+                image: validImages[0], // First image as main image
+                images: validImages, // Array of all images
                 stock: parseInt(editingProduct.stock) || 0,
                 description: editingProduct.description || '',
                 isSale: editingProduct.isSale
@@ -301,13 +331,48 @@ const ManageProducts = () => {
                                 </div>
                             </div>
 
+                             {/* Product Images */}
                             <div className='form-group'>
-                                <label>Image URL</label>
-                                <input
-                                    type='url'
-                                    value={editingProduct.images}
-                                    onChange={(e) => handleInputChange('image', e.target.value)}
-                                />
+                                <label style={{fontWeight: 600, marginBottom: '10px', display: 'block'}}>Product Images</label>
+                                
+                                {editingProduct.images.map((image, index) => (
+                                    <div key={index} className="form-group image-input-group">
+                                        <label>Image {index + 1}</label>
+                                        <div>
+                                            <input 
+                                                type='url'
+                                                value={image}
+                                                onChange={(e) => handleImageChange(index, e.target.value)}
+                                                placeholder='https://example.com/image.jpg'
+                                                className="image-url-input"
+                                            />
+                                            {index > 0 && (
+                                                <button
+                                                    type='button'
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    className="remove-img-btn-small"
+                                                >
+                                                    Remove
+                                                </button>
+                                            )}
+                                        </div>
+                                        {image && (
+                                            <img
+                                                src={image}
+                                                alt={`Preview ${index + 1}`}
+                                                className="image-preview-small"
+                                                onError={(e) => e.target.style.display = 'none'}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                                <button
+                                    type='button'
+                                    onClick={handleAddImage}
+                                    className="add-img-btn-small"
+                                >
+                                    + Add Another Image
+                                </button>
                             </div>
 
                             <div className='form-group'>

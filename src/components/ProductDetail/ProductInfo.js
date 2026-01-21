@@ -1,26 +1,62 @@
 import React, { useState } from "react";
-
-import "./ProductInfo.css";
+import { toast } from "react-toastify";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 import { useCart } from "../../context/CartContext";
-import { toast } from "react-toastify";
+import "./ProductInfo.css";
 
 const ProductInfo = ({ product, productName, price, salePrice }) => {
   const { addToCart } = useCart();
-  const sizes = ["50ml", "100ml", "200ml"];
-  const [selectedSize, setSelectedSize] = useState(sizes[0])
+  // const sizes = ["50ml", "100ml", "200ml"];
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '100ml')
   const [quantity, setQuantity] = useState(1)
 
+  // Get current size pricing
+  const getCurrentPrice = () => {
+    if (product.isSale && product.saleSizes?.length) {
+      const saleSize = product.saleSizes.find(s => s.size === selectedSize);
+      return {
+        original: saleSize?.originalPrice,
+        discounted: saleSize?.discountedPrice,
+        isSale: true
+      };
+    } 
+    
+    if (product.sizes?.length) {
+        const regularSize = product.sizes.find(s => s.size === selectedSize);
+        return {
+          price: regularSize?.price,
+          isSale: false
+        }
+      }
+
+      if (product.isSale && product.originalPrice && product.discountedPrice) {
+        return {
+          isSale: true,
+          original: product.originalPrice,
+          discounted: product.discountedPrice
+        }
+      }
+      return { price: product.price, isSale: false };
+  }
+
+  const currentPrice = getCurrentPrice();
+
   const handleAddToCart = () => {
+    const productToAdd = {
+      ...product,
+      selectedSize,
+      price: currentPrice.isSale ? currentPrice.discountedPrice : currentPrice.price
+    };
+
     for (let i = 0; i < quantity; i++) {
-      addToCart(product)
+      addToCart(productToAdd);
     }
-     toast.success(`${productName} added to cart`);
+    toast.success(`${product.productName} (${selectedSize}) added to cart`);
   }
 
   return (
     <div className="product-info">
-      <h1>{productName}</h1>
+      <h1>{product.productName}</h1>
 
       <div className="delivery">
         <i className="fa-solid fa-truck-fast"></i>
@@ -28,8 +64,20 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
       </div>
 
       <div className="sale">
-        <h3 id="product-price" style={salePrice ? { textDecoration: 'line-through', color: '#999' } : {}}>Rs. {price.toLocaleString("en-PK")}</h3>
-        {salePrice && <h3 id="product-price-sale">Rs. {salePrice.toLocaleString("en-PK")}</h3>}
+        {currentPrice.isSale ? (
+          <>
+            <h3 style={{ textDecoration: 'line-through', color: '#999' }}>
+              Rs. {currentPrice.original?.toLocaleString("en-PK")}
+            </h3>
+            <h3 id="product-price-sale">
+              Rs. {currentPrice.discounted?.toLocaleString("en-PK")}
+            </h3>
+          </>
+        ) : (
+          <h3 id="product-price">
+            Rs. {currentPrice.price?.toLocaleString("en-PK")}
+          </h3>
+        )}
       </div>
 
       <div className="size">
@@ -38,13 +86,13 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
         </p>
 
       <div className="size-options">
-        {sizes.map((size, index) => (
+        {product.sizes?.map((sizeObj, index) => (
           <div
             key={index}
-            className={`size-box ${selectedSize === size ? "active" : ""}`}
-            onClick={()=> setSelectedSize(size)}
+            className={`size-box ${selectedSize === sizeObj.size ? "active" : ""}`}
+            onClick={()=> setSelectedSize(sizeObj.size)}
           >
-            {size}
+            {sizeObj.size}
           </div>
         ))}
       </div>

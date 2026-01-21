@@ -176,6 +176,24 @@
   font-size: 14px;
 }
 
+.size-input-group {
+  margin-bottom: 20px;
+}
+
+.size-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.size-name-input {
+  flex: 1;
+}
+
+.size-price-input {
+  flex: 1;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -229,6 +247,56 @@
   margin-right: 12px;
   cursor: pointer;
   accent-color: #4CAF50;
+}
+
+/* Image input specific styles */
+.image-input-group {
+  margin-bottom: 25px;
+}
+
+.image-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.image-url-input {
+  flex: 1;
+}
+
+.remove-img-btn {
+  padding: 12px 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.remove-img-btn:hover {
+  background-color: #d32f2f;
+}
+
+.add-img-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.add-img-btn:hover {
+  background-color: #1976D2;
 }
 
 .image-preview {

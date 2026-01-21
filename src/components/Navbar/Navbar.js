@@ -138,7 +138,7 @@ const Navbar = () => {
    ) : (
     cartItems.map((item) => (
       <div key={item.id} className="cart-item">
-        <img src={item.image} alt={item.productName} />
+        <img src={item.images} alt={item.productName} />
         <div className="item-details">
           <h4>{item.productName}</h4>
           <p className="item-price">{item.isSale ? item.discountedPrice : item.price}</p>

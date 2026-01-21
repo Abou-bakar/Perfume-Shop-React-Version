@@ -11,10 +11,7 @@ const ProductDetail = ({product}) => {
         <ProductImages images={product.images || [product.image]} />
 
         <ProductInfo
-        product={product} 
-        productName={product.productName}
-        price={product.isSale ? product.originalPrice : product.price}
-        salePrice={product.isSale ? product.discountedPrice : null}
+        product={product}
         />
         <div className="accordion-container">
         <FaqItem question="Description"
