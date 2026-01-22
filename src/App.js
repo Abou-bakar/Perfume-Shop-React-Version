@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
@@ -21,16 +20,20 @@ import AllProducts from './pages/AllProducts';
 import AddProduct from './pages/AddProduct';
 import ManageProducts from './pages/ManageProducts';
 import { ToastContainer } from 'react-toastify';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 function App() {
   const location = useLocation();
 
   // Pages where BottomTab should NOT appear
-  const hideBottomTabRoutes = ['/admin', '/login', '/checkout', '/order-confirmation']
+  const hideBottomTabRoutes = ['/admin', '/login', '/add-product', '/manage-products', '/checkout', '/order-confirmation']
 
   const hideBottomTab = hideBottomTabRoutes.includes(location.pathname)
+  
   return (
-    <>
+    <AuthProvider>
+      <CartProvider>
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -41,7 +44,6 @@ function App() {
         draggable
         theme="light"
       />
-      <CartProvider>
         <Routes>
 
           {/* User pages */}
@@ -59,20 +61,21 @@ function App() {
 
           {/* Minimal pages */}
           <Route element={<MinimalLayout />}>
-            <Route path='/add-product' element={<AddProduct />} />
-            <Route path='/manage-products' element={<ManageProducts />} />
             <Route path='/checkout' element={<Checkout />} />
             <Route path='/order-confirmation' element={<OrderConfirmation />} />
             <Route path='/login' element={<Login />} />
-            <Route path='/admin' element={<Admin />} />
+
+            {/* Protected admin pages */}
+            <Route path='/admin' element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path='/add-product' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
+            <Route path='/manage-products' element={<ProtectedRoute><ManageProducts /></ProtectedRoute>} />
           </Route>
 
           {/* 404 Page */}
           <Route path='*' element={<Error />} />
-
         </Routes>
       </CartProvider>
-    </>
+      </AuthProvider>
   )
 }
 

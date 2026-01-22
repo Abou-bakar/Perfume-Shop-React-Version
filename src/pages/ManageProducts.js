@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import logo from "../assets/images/logo.png";
+import { field } from 'firebase/firestore/pipelines';
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([])
@@ -53,7 +54,8 @@ const ManageProducts = () => {
     // Start editing
     const handleEdit = (product) => {
         const images = Array.isArray(product.images) ? product.images : [product.image || '']
-        setEditingProduct({ ...product, images });
+        const sizes = Array.isArray(product.sizes) ? product.sizes : [{ size: '', price: product.price || '' }]
+        setEditingProduct({ ...product, images, sizes });
     };
 
     // Cancel editing
@@ -74,10 +76,33 @@ const ManageProducts = () => {
             images: prev.images.filter((_, i) => i !== index)
         }))
     }
+
     const handleImageChange = (index, value) => {
         setEditingProduct(prev => ({
             ...prev,
             images: prev.images.map((img, i) => i === index ? value : img)
+        }))
+    }
+
+    // Size handlers
+    const handleAddSize = () => {
+        setEditingProduct(prev => ({
+            ...prev,
+            sizes: [...prev.sizes, { size: '', price: '' }]
+        }))
+    }
+
+    const handleRemoveSize = (index) => {
+        setEditingProduct(prev => ({
+            ...prev,
+            sizes: prev.sizes.filter((_, i) => i !== index)
+        }))
+    }
+
+    const handleSizeChange = (index, value) => {
+        setEditingProduct(prev => ({
+            ...prev,
+            sizes: prev.sizes.map((s, i) => i === index ? { ...s, [field]: value } : s)
         }))
     }
 
@@ -92,24 +117,46 @@ const ManageProducts = () => {
                 return;
             }
 
+            const validSizes = editingProduct.sizes.filter(s => s.size.trim() !== '' && s.price);
+
+            if (validSizes.length === 0) {
+                toast.error('Please add at least one size with price');
+                return;
+            }
+
             const productRef = doc(db, "products", editingProduct.id);
             const updateData = {
                 productName: editingProduct.productName,
-                price: parseInt(editingProduct.price),
+                price: parseInt(validSizes[0].price),
                 category: editingProduct.category,
                 for: editingProduct.for,
                 image: validImages[0], // First image as main image
                 images: validImages, // Array of all images
+                sizes: validSizes.map(s => ({
+                    size: s.size,
+                    price: parseInt(s.price)
+                })),
                 stock: parseInt(editingProduct.stock) || 0,
                 description: editingProduct.description || '',
                 isSale: editingProduct.isSale
             };
 
             if (editingProduct.isSale) {
-                updateData.originalPrice = parseInt(editingProduct.originalPrice);
-                updateData.discountedPrice = parseInt(editingProduct.discountedPrice);
-                updateData.salePercent = parseInt(editingProduct.salePercent);
+                const salePercent = parseInt(editingProduct.salePercent);
+                updateData.saleSizes = validSizes.map(s => {
+                    const originalPrice = parseInt(s.price)
+                    const discountedPrice = Math.round(originalPrice * (1 - salePercent / 100))
+                    return {
+                        size: s.size,
+                        originalPrice: originalPrice,
+                        discountedPrice: discountedPrice
+                    }
+                })
+                updateData.salePercent = salePercent;
+                updateData.originalPrice = parseInt(validSizes[0].price);
+                updateData.discountedPrice = updateData.saleSizes[0].discountedPrice;
             } else {
+                updateData.saleSizes = null;
                 updateData.originalPrice = null;
                 updateData.discountedPrice = null;
                 updateData.salePercent = null;
@@ -147,303 +194,329 @@ const ManageProducts = () => {
     }
 
     return (
-         <div className="admin-layout">
-      {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <span className="logo">
-          <img src={logo} alt="" />
-          <h1>
-            Perfumes<br />
-            Mists
-          </h1>
-        </span>
+        
+        <div className="admin-layout">
+            {/* Sidebar */}
+            <aside className="admin-sidebar">
+                <span className="logo">
+                    <img src={logo} alt="" />
+                    <h1>
+                        Perfumes<br />
+                        Mists
+                    </h1>
+                </span>
 
-        <nav className="admin-menu">
-          <Link to="/admin">Dashboard</Link>
-          <Link to="/add-product">Add Product</Link>
-          <Link to="/manage-products">Manage Products</Link>
-          <Link to="/categories">Categories</Link>
-          <Link to="/sales">Sales</Link>
-          <Link to="/orders">Orders</Link>
-          <Link to="/customers">Customers</Link>
-          <Link to="/settings">Settings</Link>
-        </nav>
-      </aside>
-      
-        <div className='manage-container'>
-            <div className='manage-header'>
-                <h1>Manage Products</h1>
-            </div>
+                <nav className="admin-menu">
+                    <Link to="/admin">Dashboard</Link>
+                    <Link to="/add-product">Add Product</Link>
+                    <Link to="/manage-products">Manage Products</Link>
+                    <Link to="/categories">Categories</Link>
+                    <Link to="/sales">Sales</Link>
+                    <Link to="/orders">Orders</Link>
+                    <Link to="/customers">Customers</Link>
+                    <Link to="/settings">Settings</Link>
+                </nav>
+            </aside>
 
-            {/* Search and Filter */}
-            <div className='manage-controls'>
-                <input
-                    type='text'
-                    placeholder='Search Products...'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className='search-input'
-                />
-                <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    className='filter-select'
-                >
-                    <option value="all">All Categories</option>
-                    <option value="fragrance">Fragrance</option>
-                    <option value="body-mist">Body Mist</option>
-                    <option value="deodorant">Deodorant</option>
-                    <option value="perfume-oil">Perfume Oil</option>
-                </select>
-                <span className='product-count'>{filteredProducts.length} products</span>
-            </div>
+            <div className='manage-container'>
+                <div className='manage-header'>
+                    <h1>Manage Products</h1>
+                </div>
 
-            {/* Products Table */}
-            <div className='products-table-container'>
-                <table className='products-table'>
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>For</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Sale</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredProducts.length === 0 ? (
+                {/* Search and Filter */}
+                <div className='manage-controls'>
+                    <input
+                        type='text'
+                        placeholder='Search Products...'
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className='search-input'
+                    />
+                    <select
+                        value={filterCategory}
+                        onChange={(e) => setFilterCategory(e.target.value)}
+                        className='filter-select'
+                    >
+                        <option value="all">All Categories</option>
+                        <option value="fragrance">Fragrance</option>
+                        <option value="body-mist">Body Mist</option>
+                        <option value="deodorant">Deodorant</option>
+                        <option value="perfume-oil">Perfume Oil</option>
+                    </select>
+                    <span className='product-count'>{filteredProducts.length} products</span>
+                </div>
+
+                {/* Products Table */}
+                <div className='products-table-container'>
+                    <table className='products-table'>
+                        <thead>
                             <tr>
-                                <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }}>
-                                    No products found
-                                </td>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>For</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Sale</th>
+                                <th>Actions</th>
                             </tr>
-                        ) : (
-                            filteredProducts.map(product => (
-                                <tr key={product.id}>
-                                    <td>
-                                        <img
-                                            src={product.images}
-                                            alt={product.productName}
-                                            className='product-thumbnail'
-                                        />
-                                    </td>
-                                    <td>{product.productName}</td>
-                                    <td>{product.category}</td>
-                                    <td>{product.for}</td>
-                                    <td>Rs. {product.price?.toLocaleString('en-PK')}</td>
-                                    <td>{product.stock || 0}</td>
-                                    <td>
-                                        {product.isSale ? (
-                                            <span className='badge sale-badge'>
-                                                {product.salePercent}% OFF
-                                            </span>
-                                        ) : (
-                                            <span className='badge'>-</span>
-                                        )}
-                                    </td>
-                                    <td className='action-buttons'>
-                                        <button
-                                            className='edit-btn'
-                                            onClick={() => handleEdit(product)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className='delete-btn'
-                                            onClick={() => handleDelete(product.id, product.productName)}
-                                        >
-                                            Delete
-                                        </button>
+                        </thead>
+                        <tbody>
+                            {filteredProducts.length === 0 ? (
+                                <tr>
+                                    <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }}>
+                                        No products found
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Edit Modal */}
-            {editingProduct && (
-                <div className='modal-overlay' onClick={handleCancelEdit}>
-                    <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-                        <div className='modal-header'>
-                            <h2>Edit Product</h2>
-                            <button className='close-btn' onClick={handleCancelEdit}><i class="fa-solid fa-x"></i></button>
-                        </div>
-
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label>Product Name</label>
-                                <input
-                                    type='text'
-                                    value={editingProduct.productName}
-                                    onChange={(e) => handleInputChange('productName', e.target.value)}
-                                />
-                            </div>
-
-                            <div className='form-row'>
-                                <div className='form-group'>
-                                    <label>Category</label>
-                                    <select
-                                        value={editingProduct.category}
-                                        onChange={(e) => handleInputChange('category', e.target.value)}
-                                    >
-                                        <option value="fragrance">Fragrance</option>
-                                        <option value="body-mist">Body Mist</option>
-                                        <option value="deodorant">Deodorant</option>
-                                        <option value="perfume-oil">Perfume Oil</option>
-                                    </select>
-                                </div>
-
-                                <div className='form-group'>
-                                    <label>For</label>
-                                    <select
-                                        value={editingProduct.for}
-                                        onChange={(e) => handleInputChange('for', e.target.value)}
-                                    >
-                                        <option value="men">Men</option>
-                                        <option value="women">Women</option>
-                                        <option value="unisex">unisex</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className='form-row'>
-                                <div className='form-group'>
-                                    <label>Price (PKR)</label>
-                                    <input
-                                        type='number'
-                                        value={editingProduct.price}
-                                        onChange={(e) => handleInputChange('price', e.target.value)}
-                                    />
-                                </div>
-
-                                <div className='form-group'>
-                                    <label>Stock</label>
-                                    <input
-                                        type='number'
-                                        value={editingProduct.stock}
-                                        onChange={(e) => handleInputChange('stock', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                             {/* Product Images */}
-                            <div className='form-group'>
-                                <label style={{fontWeight: 600, marginBottom: '10px', display: 'block'}}>Product Images</label>
-                                
-                                {editingProduct.images.map((image, index) => (
-                                    <div key={index} className="form-group image-input-group">
-                                        <label>Image {index + 1}</label>
-                                        <div>
-                                            <input 
-                                                type='url'
-                                                value={image}
-                                                onChange={(e) => handleImageChange(index, e.target.value)}
-                                                placeholder='https://example.com/image.jpg'
-                                                className="image-url-input"
-                                            />
-                                            {index > 0 && (
-                                                <button
-                                                    type='button'
-                                                    onClick={() => handleRemoveImage(index)}
-                                                    className="remove-img-btn-small"
-                                                >
-                                                    Remove
-                                                </button>
-                                            )}
-                                        </div>
-                                        {image && (
+                            ) : (
+                                filteredProducts.map(product => (
+                                    <tr key={product.id}>
+                                        <td>
                                             <img
-                                                src={image}
-                                                alt={`Preview ${index + 1}`}
-                                                className="image-preview-small"
-                                                onError={(e) => e.target.style.display = 'none'}
+                                                src={Array.isArray(product.images) ? product.images[0] : product.image}
+                                                alt={product.productName}
+                                                className='product-thumbnail'
                                             />
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type='button'
-                                    onClick={handleAddImage}
-                                    className="add-img-btn-small"
-                                >
-                                    + Add Another Image
-                                </button>
+                                        </td>
+                                        <td>{product.productName}</td>
+                                        <td>{product.category}</td>
+                                        <td>{product.for}</td>
+                                        <td>Rs. {product.price?.toLocaleString('en-PK')}</td>
+                                        <td>{product.stock || 0}</td>
+                                        <td>
+                                            {product.isSale ? (
+                                                <span className='badge sale-badge'>
+                                                    {product.salePercent}% OFF
+                                                </span>
+                                            ) : (
+                                                <span className='badge'>-</span>
+                                            )}
+                                        </td>
+                                        <td className='action-buttons'>
+                                            <button
+                                                className='edit-btn'
+                                                onClick={() => handleEdit(product)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className='delete-btn'
+                                                onClick={() => handleDelete(product.id, product.productName)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Edit Modal */}
+                {editingProduct && (
+                    <div className='modal-overlay' onClick={handleCancelEdit}>
+                        <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+                            <div className='modal-header'>
+                                <h2>Edit Product</h2>
+                                <button className='close-btn' onClick={handleCancelEdit}><i class="fa-solid fa-x"></i></button>
                             </div>
 
-                            <div className='form-group'>
-                                <label>Description</label>
-                                <textarea
-                                    value={editingProduct.description || ''}
-                                    onChange={(e) => handleInputChange('description', e.target.value)}
-                                    rows="3"
-                                />
-                            </div>
-
-                            <div className='form-group checkbox'>
-                                <label>
+                            <div className='modal-body'>
+                                <div className='form-group'>
+                                    <label>Product Name</label>
                                     <input
-                                        type='checkbox'
-                                        checked={editingProduct.isSale}
-                                        onChange={(e) => handleInputChange('isSale', e.target.value)}
+                                        type='text'
+                                        value={editingProduct.productName}
+                                        onChange={(e) => handleInputChange('productName', e.target.value)}
                                     />
-                                    This product is on sale
-                                </label>
-                            </div>
+                                </div>
 
-                            {editingProduct.isSale && (
-                                <>
-                                    <div className='form-row'>
-                                        <div className='form-group'>
-                                            <label>Original Price</label>
-                                            <input
-                                                type='number'
-                                                value={editingProduct.originalPrice || ''}
-                                                onChange={(e) => handleInputChange('originalPrice', e.target.value)}
-                                            />
-                                        </div>
-
-                                        <div className='form-group'>
-                                            <label>Discounted Price</label>
-                                            <input
-                                                type='number'
-                                                value={editingProduct.discountedPrice || ''}
-                                                onChange={(e) => handleInputChange('discountedPrice', e.target.value)}
-                                            />
-                                        </div>
+                                <div className='form-row'>
+                                    <div className='form-group'>
+                                        <label>Category</label>
+                                        <select
+                                            value={editingProduct.category}
+                                            onChange={(e) => handleInputChange('category', e.target.value)}
+                                        >
+                                            <option value="fragrance">Fragrance</option>
+                                            <option value="body-mist">Body Mist</option>
+                                            <option value="deodorant">Deodorant</option>
+                                            <option value="perfume-oil">Perfume Oil</option>
+                                        </select>
                                     </div>
 
                                     <div className='form-group'>
-                                        <label>Sale Percentage</label>
+                                        <label>For</label>
+                                        <select
+                                            value={editingProduct.for}
+                                            onChange={(e) => handleInputChange('for', e.target.value)}
+                                        >
+                                            <option value="men">Men</option>
+                                            <option value="women">Women</option>
+                                            <option value="unisex">unisex</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className='form-row'>
+                                    <div className='form-group'>
+                                        <label>Price (PKR)</label>
+                                        <input
+                                            type='number'
+                                            value={editingProduct.price}
+                                            onChange={(e) => handleInputChange('price', e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className='form-group'>
+                                        <label>Stock</label>
+                                        <input
+                                            type='number'
+                                            value={editingProduct.stock}
+                                            onChange={(e) => handleInputChange('stock', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Product Images */}
+                                <div className='form-group'>
+                                    <label style={{ fontWeight: 600, marginBottom: '10px', display: 'block' }}>Product Images</label>
+
+                                    {editingProduct.images.map((image, index) => (
+                                        <div key={index} className="form-group image-input-group">
+                                            <label>Image {index + 1}</label>
+                                            <div>
+                                                <input
+                                                    type='url'
+                                                    value={image}
+                                                    onChange={(e) => handleImageChange(index, e.target.value)}
+                                                    placeholder='https://example.com/image.jpg'
+                                                    className="image-url-input"
+                                                />
+                                                {index > 0 && (
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => handleRemoveImage(index)}
+                                                        className="remove-img-btn-small"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {image && (
+                                                <img
+                                                    src={image}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className="image-preview-small"
+                                                    onError={(e) => e.target.style.display = 'none'}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                    <button
+                                        type='button'
+                                        onClick={handleAddImage}
+                                        className="add-img-btn-small"
+                                    >
+                                        + Add Another Image
+                                    </button>
+                                </div>
+
+                                {/* Sizes & Pricing */}
+                                <div className='form-section'>
+                                    <label style={{ fontWeight: 600, marginBottom: '10px', display: 'block' }}>Sizes & Pricing</label>
+
+                                    {editingProduct.sizes.map((sizeObj, index) => (
+                                        <div key={index} className='form-group size-input-group'>
+                                            <label>Size {index + 1}</label>
+                                            <div className='size-input-wrapper'>
+                                                <input
+                                                    type='text'
+                                                    value={sizeObj.size}
+                                                    onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
+                                                    placeholder="e.g., 50ml"
+                                                    className="size-name-input"
+                                                />
+                                                <input
+                                                    type='number'
+                                                    value={sizeObj.price}
+                                                    onChange={(e) => handleSizeChange(index, 'price', e.target.value)}
+                                                    placeholder="Price (PKR)"
+                                                    className="size-price-input"
+                                                />
+                                                {index > 0 && (
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => handleRemoveSize(index)}
+                                                        className="remove-img-btn-small"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type='button'
+                                        onClick={handleAddSize}
+                                        className="add-img-btn-small"
+                                    >
+                                        + Add Another Size
+                                    </button>
+                                </div>
+
+                                <div className='form-group'>
+                                    <label>Description</label>
+                                    <textarea
+                                        value={editingProduct.description || ''}
+                                        onChange={(e) => handleInputChange('description', e.target.value)}
+                                        rows="3"
+                                    />
+                                </div>
+
+                                <div className='form-group checkbox'>
+                                    <label>
+                                        <input
+                                            type='checkbox'
+                                            checked={editingProduct.isSale}
+                                            onChange={(e) => handleInputChange('isSale', e.target.checked)}
+                                        />
+                                        This product is on sale
+                                    </label>
+                                </div>
+
+                                {editingProduct.isSale && (
+                                    <div className='form-group'>
+                                        <label>Sale Percentage (applies to all sizes)</label>
                                         <input
                                             type='number'
                                             value={editingProduct.salePercent || ''}
                                             onChange={(e) => handleInputChange('salePercent', e.target.value)}
                                             min="1"
                                             max="100"
+                                            placeholder="e.g., 25"
                                         />
+                                        <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                                            This discount will be applied to all size prices automatically
+                                        </small>
                                     </div>
-                                </>
-                            )}
-                        </div>
+                                )}
+                            </div>
 
-                        <div className='modal-footer'>
-                            <button className='cancel-btn' onClick={handleCancelEdit}>
-                                Cancel
-                            </button>
-                            <button className='save-btn' onClick={handleSaveEdit}>
-                                Save Changes
-                            </button>
+                            <div className='modal-footer'>
+                                <button className='cancel-btn' onClick={handleCancelEdit}>
+                                    Cancel
+                                </button>
+                                <button className='save-btn' onClick={handleSaveEdit}>
+                                    Save Changes
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
-        </div>
+                )}
+            </div>
+        </div >
     )
 }
 
