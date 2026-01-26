@@ -1,9 +1,9 @@
 import React from 'react'
 import './Loader.css'
 
-const Loader = () => {
+const Loader = ({fullScreen = false}) => {
   return (
-     <div className="loader-wrapper">
+     <div className={`loader-wrapper ${fullScreen ? 'fullscreen' : ''}`}>
       <div className="spinner"></div>
     </div>
   )
