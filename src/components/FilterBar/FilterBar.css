@@ -1,21 +1,81 @@
-.filter-bar,
-.sort-bar {
+.filter-bar {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
-select {
-  padding: 8px 12px;
-  border: 1px solid black;
-  background-color: white;
+.filter-label {
   font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border: 1.5px solid #000;
+  background-color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
   cursor: pointer;
+  border-radius: 6px;
+  appearance: none;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.filter-select:hover {
+  background-color: #f8f8f8;
+  border-color: #333;
+}
+
+.filter-select:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.filter-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.filter-select:hover ~ .select-icon {
+  color: #333;
 }
 
 @media (max-width: 576px) {
-select {
-  padding: 6px 0;
-  font-size: 12px;
-}
+  .filter-bar {
+    gap: 8px;
+  }
+
+  .filter-select {
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+  }
+
+  .select-icon {
+    right: 10px;
+  }
 }

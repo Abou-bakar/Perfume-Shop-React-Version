@@ -7,7 +7,7 @@ const Error = () => {
     <section class="error-container">
         <div class="error-content">
             <h1>LOOKS LIKE OUR AIM WAS A LITTLE OFF</h1>
-            <a href="home.html"><button class="home-btn">HOME PAGE</button></a>
+            <a href="/"><button class="home-btn">HOME PAGE</button></a>
         </div>
     </section>
     </>

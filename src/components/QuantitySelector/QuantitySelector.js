@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import './QuantitySelector.css'
 
 const QuantitySelector = ({
@@ -30,7 +30,7 @@ const QuantitySelector = ({
          &minus;
       </button>
 
-      <input 
+      <input
         type='number'
         id='quantity'
         value={quantity}

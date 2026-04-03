@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import logo from "../assets/images/logo.png";
-import { field } from 'firebase/firestore/pipelines';
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([])
@@ -99,7 +98,7 @@ const ManageProducts = () => {
         }))
     }
 
-    const handleSizeChange = (index, value) => {
+    const handleSizeChange = (index, field, value) => {
         setEditingProduct(prev => ({
             ...prev,
             sizes: prev.sizes.map((s, i) => i === index ? { ...s, [field]: value } : s)
@@ -235,7 +234,7 @@ const ManageProducts = () => {
                     <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value)}
-                        className='filter-select'
+                        className='filter-sel'
                     >
                         <option value="all">All Categories</option>
                         <option value="fragrance">Fragrance</option>

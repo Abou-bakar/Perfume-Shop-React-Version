@@ -2,11 +2,15 @@ import { useCart } from '../context/CartContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import '../styles/checkout.css'
+import { image } from 'framer-motion/client';
 
 const Checkout = () => {
     const { cartItems, getCartTotal } = useCart();
     const navigate = useNavigate();
+    const [submitting, setSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -38,33 +42,84 @@ const Checkout = () => {
     const subTotal = getCartTotal();
     const total = subTotal + shippingCost;
 
-    const handleCompleteOrder = () => {
+    const handleCompleteOrder = async () => {
         // Validate required fields
         if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.phone) {
             toast.error('Please fill in all required fields');
             return;
         };
 
-        // Generate order number
-        const orderNumber = Math.floor(10000 + Math.random() * 90000)
+        setSubmitting(true);
 
-        // Prepare order details
-        const orderDetails = {
-            orderNumber,
-            items: cartItems,
-            formData,
-            subTotal,
-            shipping: shippingCost,
-            total,
-            orderDate: new Date().toISOString()
+        try {
+            // Generate order number
+            const orderNumber = Math.floor(10000 + Math.random() * 90000)
+
+            // Prepare order details for Firestore
+            const orderData = {
+                orderNumber,
+                customerInfo: {
+                    email: formData.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    address: formData.address,
+                    city: formData.city,
+                    postalCode: formData.postalCode,
+                    phone: formData.phone
+                },
+                items: cartItems.map(item => ({
+                    id: item.id,
+                    productName: item.productName,
+                    price: item.price,
+                    discountedPrice: item.discountedPrice || null,
+                    isSale: item.isSale || false,
+                    quantity: item.quantity,
+                    selectedSize: item.selectedSize || null,
+                    image: Array.isArray(item.images) ? item.images[0] : item.image
+                })),
+                subTotal,
+                shipping: shippingCost,
+                total,
+                paymentMethod: formData.paymentMethod,
+                billingAddressType: formData.billingAddressType,
+                status: 'pending', // pending, confirmed, shipped, delivered, cancelled
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            // Save order to Firestore
+            const ordersRef = collection(db, "orders");
+            const docRef = await addDoc(ordersRef, orderData);
+
+            console.log("Order saved with ID:", docRef.id);
+
+            // Prepare order details for session storage (for confirmation page)
+            const orderDetails = {
+                orderNumber,
+                items: cartItems,
+                formData,
+                subTotal,
+                shipping: shippingCost,
+                total,
+                orderData: new Date().toISOString()
+            };
+
+            // Save to sessionStorage for confirmation page
+            sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+
+            // Show success message
+            toast.success('Order placed successfully!');
+
+            // Navigate to confirmation page
+            navigate('/order-confirmation')
+
+        } catch (error) {
+            console.error("Error saving order:", error);
+            toast.error('Failed to place order. Please try again.');
+        } finally {
+            setSubmitting(false);
         }
-
-        // Save to sessionStorage
-        sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails))
-
-        // Navigate to confirmation page
-        navigate('/order-confirmation')
-    }
+    };
 
     if (cartItems.length === 0) {
         return null;
@@ -264,7 +319,17 @@ const Checkout = () => {
                         </div>
                     </section>
 
-                    <button className="complete-order" onClick={handleCompleteOrder}>Complete Order</button>
+                    <button
+                        className="complete-order"
+                        onClick={handleCompleteOrder}
+                        disabled={submitting}
+                        style={{
+                            opacity: submitting ? 0.6 : 1,
+                            cursor: submitting ? 'not-allowed' : 'pointer'
+                        }}
+                    >
+                        {submitting ? 'Processing...' : 'Complete Order'}
+                    </button>
                 </div>
 
                 <div className="checkout-right">

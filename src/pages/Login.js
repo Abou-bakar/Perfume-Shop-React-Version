@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+
 import "../styles/login.css";
 import logo from "../assets/images/logo.png";
 
@@ -37,49 +38,61 @@ const Login = () => {
   };
 
   return (
-    <>
+    <div className="login-wrapper">
       <div className="login-container">
-        <div className="login-header">
-          <span className="logo">
-            <img src={logo} alt="" />
-            <h1>
-              Perfumes<br></br>
-              Mists
-            </h1>
-          </span>
-        </div>
+        <div className="login-card">
+          <div className="login-header">
+            <div className="logo-wrapper">
+              <img src={logo} alt="Perfumes Mists" className="logo-image" />
+            </div>
+            <h1 className="login-title">Perfumes Mists</h1>
+            <p className="login-subtitle">Welcome back</p>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className='signup-btn'
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="loading-btn">
-                <span className="spinner"></span>
-              </span>
-            ) : (
-              'Login'
-            )}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="form-input"
+              />
+            </div>
+            
+            <div className="form-group">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="form-input"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="spinner-container">
+                  <span className="spinner"></span>
+                </span>
+              ) : (
+                'Sign in'
+              )}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p>© 2026 Perfumes Mists. All rights reserved.</p>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

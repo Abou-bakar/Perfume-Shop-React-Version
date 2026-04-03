@@ -19,6 +19,7 @@ import { CartProvider } from './context/CartContext';
 import AllProducts from './pages/AllProducts';
 import AddProduct from './pages/AddProduct';
 import ManageProducts from './pages/ManageProducts';
+import ManageOrders from './pages/ManageOrders';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -69,6 +70,7 @@ function App() {
             <Route path='/admin' element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path='/add-product' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
             <Route path='/manage-products' element={<ProtectedRoute><ManageProducts /></ProtectedRoute>} />
+            <Route path='/manage-orders' element={<ProtectedRoute><ManageOrders /></ProtectedRoute>} />
           </Route>
 
           {/* 404 Page */}

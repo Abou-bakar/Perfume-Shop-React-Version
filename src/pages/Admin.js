@@ -44,7 +44,7 @@ const Admin = () => {
             <Link to="/manage-products">Manage Products</Link>
             <Link to="/categories">Categories</Link>
             <Link to="/sales">Sales</Link>
-            <Link to="/orders">Orders</Link>
+            <Link to="/manage-orders">Manage Orders</Link>
             <Link to="/customers">Customers</Link>
             <Link to="/settings">Settings</Link>
             <button onClick={handleLogout} style={{
