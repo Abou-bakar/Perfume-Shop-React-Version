@@ -3,12 +3,16 @@ import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firesto
 import { db } from '../config/firebase';
 import '../styles/manageproducts.css';
 import Loader from '../components/Loader/Loader';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import logo from "../assets/images/logo.png";
+import { useAuth } from '../context/AuthContext';
 
 const ManageProducts = () => {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const [editingProduct, setEditingProduct] = useState(null)
@@ -192,28 +196,37 @@ const ManageProducts = () => {
         return <Loader />
     }
 
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast.success('Logged out successfully');
+            navigate('/login');
+        } catch (error) {
+            toast.error('Failed to logout');
+        }
+    };
+
     return (
-        
+
         <div className="admin-layout">
             {/* Sidebar */}
             <aside className="admin-sidebar">
                 <span className="logo">
                     <img src={logo} alt="" />
-                    <h1>
-                        Perfumes<br />
-                        Mists
-                    </h1>
+                    <h1>Perfumes<br />Mists</h1>
                 </span>
-
                 <nav className="admin-menu">
                     <Link to="/admin">Dashboard</Link>
                     <Link to="/add-product">Add Product</Link>
-                    <Link to="/manage-products">Manage Products</Link>
+                    <Link to="/manage-products" className="active-link">Manage Products</Link>
+                    <Link to="/manage-inventory">Manage Inventory</Link>
+                    <Link to="/manage-orders">Manage Orders</Link>
+                    <Link to="/analytics">Analytics</Link>
                     <Link to="/categories">Categories</Link>
                     <Link to="/sales">Sales</Link>
-                    <Link to="/orders">Orders</Link>
                     <Link to="/customers">Customers</Link>
                     <Link to="/settings">Settings</Link>
+                    <button onClick={handleLogout} className="logout-btn">Logout</button>
                 </nav>
             </aside>
 
