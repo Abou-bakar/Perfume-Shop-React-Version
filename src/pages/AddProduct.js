@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import '../styles/addproduct.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import logo from "../assets/images/logo.png";
 
 const AddProduct = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     productName: '',
     price: '',
@@ -57,7 +62,7 @@ const AddProduct = () => {
   const handleAddSize = () => {
     setFormData(prev => ({
       ...prev,
-      sizes: [...prev.sizes, {size: '', price: ''}]
+      sizes: [...prev.sizes, { size: '', price: '' }]
     }))
   };
 
@@ -73,7 +78,7 @@ const AddProduct = () => {
   const handleSizeChange = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      sizes: prev.sizes.map((s, i) => i === index ? {...s, [field]: value } : s)
+      sizes: prev.sizes.map((s, i) => i === index ? { ...s, [field]: value } : s)
     }))
   };
 
@@ -123,17 +128,17 @@ const AddProduct = () => {
         // Apply same discount to all sizes
         const salePercent = parseInt(formData.salePercent)
         productData.saleSizes = validSizes.map(s => {
-         const originalPrice = parseInt(s.price);
-         const discountedPrice = Math.round(originalPrice * (1 - salePercent / 100))
-         return {
-          size: s.size,
-          originalPrice: originalPrice,
-          discountedPrice: discountedPrice
-         }
+          const originalPrice = parseInt(s.price);
+          const discountedPrice = Math.round(originalPrice * (1 - salePercent / 100))
+          return {
+            size: s.size,
+            originalPrice: originalPrice,
+            discountedPrice: discountedPrice
+          }
         });
-         productData.salePercent = salePercent;
-         productData.originalPrice = parseInt(validSizes[0].price);
-         productData.discountedPrice = productData.saleSizes[0].discountedPrice;
+        productData.salePercent = salePercent;
+        productData.originalPrice = parseInt(validSizes[0].price);
+        productData.discountedPrice = productData.saleSizes[0].discountedPrice;
       } else {
         productData.saleSizes = null;
         productData.originalPrice = null;
@@ -175,30 +180,38 @@ const AddProduct = () => {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
+
   return (
     <>
-      <div className="admin-layout">
+      <div className="addproduct-layout">
         {/* Sidebar */}
         <aside className="admin-sidebar">
-          <span className="logo">
-            <img src={logo} alt="" />
-            <h1>
-              Perfumes<br />
-              Mists
-            </h1>
-          </span>
-
-          <nav className="admin-menu">
-            <Link to="/admin">Dashboard</Link>
-            <Link to="/add-product">Add Product</Link>
-            <Link to="/manage-products">Manage Products</Link>
-            <Link to="/categories">Categories</Link>
-            <Link to="/sales">Sales</Link>
-            <Link to="/orders">Orders</Link>
-            <Link to="/customers">Customers</Link>
-            <Link to="/settings">Settings</Link>
-          </nav>
-        </aside>
+        <span className="logo">
+          <img src={logo} alt="" />
+          <h1>Perfumes<br />Mists</h1>
+        </span>
+        <nav className="admin-menu">
+          <Link to="/admin">Dashboard</Link>
+          <Link to="/add-product" className="active-link">Add Product</Link>
+          <Link to="/manage-products">Manage Products</Link>
+          <Link to="/manage-inventory">Manage Inventory</Link>
+          <Link to="/manage-orders">Manage Orders</Link>
+          <Link to="/analytics">Analytics</Link>
+          <Link to="/categories">Categories</Link>
+          <Link to="/customers">Customers</Link>
+          <Link to="/settings">Settings</Link>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
+        </nav>
+      </aside>
 
         {/* Main Content */}
         <div className="addproduct-container">
@@ -232,22 +245,22 @@ const AddProduct = () => {
               {/* Sizes & Pricing */}
               <div className="form-section">
                 <h2>Sizes & Pricing</h2>
-                <small style={{color: '#666', fontSize: '12px', display: 'block', marginBottom: '15px'}}>
+                <small style={{ color: '#666', fontSize: '12px', display: 'block', marginBottom: '15px' }}>
                   Add size options with their respective prices
                 </small>
 
                 {formData.sizes.map((sizeObj, index) => (
                   <div key={index} className="form-group size-input-group">
-                      <label>Size {index + 1} {index === 0 && '*'}</label>
-                      <div className="size-input-wrapper">
-                        <input 
-                          type='text'
-                          value={sizeObj.size}
-                          onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
-                          required={index === 0}
-                          placeholder="e.g., 50ml, 100ml, Small, Medium"
-                          className="size-name-input"
-                        />
+                    <label>Size {index + 1} {index === 0 && '*'}</label>
+                    <div className="size-input-wrapper">
+                      <input
+                        type='text'
+                        value={sizeObj.size}
+                        onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
+                        required={index === 0}
+                        placeholder="e.g., 50ml, 100ml, Small, Medium"
+                        className="size-name-input"
+                      />
                       <input
                         type="number"
                         value={sizeObj.price}
@@ -265,7 +278,7 @@ const AddProduct = () => {
                           Remove
                         </button>
                       )}
-                      </div>
+                    </div>
                   </div>
                 ))}
                 <button
@@ -491,9 +504,9 @@ const AddProduct = () => {
                       min="1"
                       max="100"
                     />
-                    <small style={{color: '#666', fontSize: '12px', marginTop: '5px', display: 'block'}}>
-                                    This discount will be applied to all size prices automatically
-                                </small>
+                    <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                      This discount will be applied to all size prices automatically
+                    </small>
                   </div>
                 </>
               )}
