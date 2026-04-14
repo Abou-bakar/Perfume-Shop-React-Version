@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 import logo from "../assets/images/logo.png";
 import '../styles/manageorders.css';
 
 const ManageOrders = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -74,7 +78,7 @@ const ManageOrders = () => {
   // Filter orders
   const filteredOrders = orders.filter(order => {
     const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
-    const matchesSearch = 
+    const matchesSearch =
       order.orderNumber.toString().includes(searchTerm) ||
       order.customerInfo.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerInfo.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,27 +114,36 @@ const ManageOrders = () => {
     );
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
+
   return (
     <div className="admin-layout">
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <span className="logo">
           <img src={logo} alt="" />
-          <h1>
-            Perfumes<br />
-            Mists
-          </h1>
+          <h1>Perfumes<br />Mists</h1>
         </span>
-
         <nav className="admin-menu">
           <Link to="/admin">Dashboard</Link>
           <Link to="/add-product">Add Product</Link>
           <Link to="/manage-products">Manage Products</Link>
-          <Link to="/manage-orders">Manage Orders</Link>
+          <Link to="/manage-inventory">Manage Inventory</Link>
+          <Link to="/manage-orders" className="active-link">Manage Orders</Link>
+          <Link to="/analytics">Analytics</Link>
           <Link to="/categories">Categories</Link>
           <Link to="/sales">Sales</Link>
           <Link to="/customers">Customers</Link>
           <Link to="/settings">Settings</Link>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
         </nav>
       </aside>
 
@@ -165,7 +178,7 @@ const ManageOrders = () => {
 
         {/* Orders Table */}
         <div className="orders-table-container">
-          <table className="orders-table">
+          <table className="main-orders-table">
             <thead>
               <tr>
                 <th>Order #</th>
@@ -190,7 +203,7 @@ const ManageOrders = () => {
                   <tr key={order.id}>
                     <td>#{order.orderNumber}</td>
                     <td>
-                      {order.createdAt ? 
+                      {order.createdAt ?
                         new Date(order.createdAt).toLocaleDateString('en-PK', {
                           year: 'numeric',
                           month: 'short',
