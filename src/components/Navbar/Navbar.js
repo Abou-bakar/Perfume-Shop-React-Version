@@ -2,23 +2,23 @@ import logo from "../../assets/images/logo.png";
 import AccordionItem from "./AccordionItem";
 import "./Navbar.css";
 import "./MobileMenu.css";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import MobileMenu from "./MobileMenu";
 import Drawer from "../Drawer/Drawer";
 import { useCart } from "../../context/CartContext";
-import { useNavigate } from 'react-router-dom';
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 
 const Navbar = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartCount } = useCart();
   const [searchActive, setSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
   const navigate = useNavigate();
-
   const searchRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -27,18 +27,40 @@ const Navbar = () => {
         searchRef.current &&
         !searchRef.current.contains(e.target)
       ) {
-        setSearchActive(false);
+        closeSearch();
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchActive]);
 
+  // Focus input when search opens
+  useEffect(() => {
+    if (searchActive && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [searchActive]);
+
+  const closeSearch = () => {
+    setSearchActive(false);
+    setSearchQuery('');
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = searchQuery.trim();
+    if (!trimmed) return;
+    closeSearch();
+    navigate(`/products?search=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Escape') closeSearch();
+  };
 
   return (
     <>
-      {/* Blur Overlay - Shows when search is active */}
+      {/* Blur Overlay */}
       {searchActive && <div className="blur-overlay" />}
 
       <nav>
@@ -60,31 +82,21 @@ const Navbar = () => {
           <MobileMenu onClose={() => setMenuOpen(false)} />
         </Drawer>
 
-
         {/* Desktop Menu */}
         <div className="nav-left">
           <ul>
             <li>
-              <NavLink
-                to="/men"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
+              <NavLink to="/men" className={({ isActive }) => (isActive ? "active" : "")}>
                 Men
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/women"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
+              <NavLink to="/women" className={({ isActive }) => (isActive ? "active" : "")}>
                 Women
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/sale"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
+              <NavLink to="/sale" className={({ isActive }) => (isActive ? "active" : "")}>
                 Sale
               </NavLink>
             </li>
@@ -96,11 +108,7 @@ const Navbar = () => {
           <Link className="logo-link" to="/" aria-label="Go to home">
             <span className="logo">
               <img src={logo} alt="" />
-              <h1>
-                Perfumes
-                <br />
-                Mists
-              </h1>
+              <h1>Perfumes<br />Mists</h1>
             </span>
           </Link>
         </div>
@@ -112,7 +120,6 @@ const Navbar = () => {
             id="cart-icon"
             onClick={() => setCartOpen(true)}
           ></i>
-          {/* <span id="cart-count">0</span> */}
           <i
             className="fa-solid fa-magnifying-glass"
             onClick={() => setSearchActive(true)}
@@ -129,10 +136,7 @@ const Navbar = () => {
       >
         <div className="cart-header">
           <h3>Your Cart ({getCartCount()})</h3>
-          <i
-            className="fa-solid fa-xmark"
-            onClick={() => setCartOpen(false)}
-          ></i>
+          <i className="fa-solid fa-xmark" onClick={() => setCartOpen(false)}></i>
         </div>
 
         <div className="cart-items">
@@ -155,11 +159,8 @@ const Navbar = () => {
                     />
                   </div>
                 </div>
-
-                <button
-                  className="remove-item"
-                  onClick={() => removeFromCart(item.id)}
-                ><i className="fa-solid fa-trash"></i>
+                <button className="remove-item" onClick={() => removeFromCart(item.id)}>
+                  <i className="fa-solid fa-trash"></i>
                 </button>
               </div>
             ))
@@ -167,9 +168,7 @@ const Navbar = () => {
         </div>
 
         <div className="cart-summary">
-          <p>
-            Subtotal: Rs. {getCartTotal().toLocaleString("en-PK")}
-          </p>
+          <p>Subtotal: Rs. {getCartTotal().toLocaleString("en-PK")}</p>
           <button
             className="checkout-btn"
             onClick={() => navigate('/checkout')}
@@ -179,26 +178,41 @@ const Navbar = () => {
               cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer'
             }}
           >
-            Checkout</button>
+            Checkout
+          </button>
         </div>
       </Drawer>
 
-
-      {/* Search Bar - Shows when searchActive is true */}
-
+      {/* Search Bar */}
       <div className={`search-container ${searchActive ? "active" : ""}`}>
-        <div ref={searchRef} className="search-box">
+        <form ref={searchRef} className="search-box" onSubmit={handleSearchSubmit}>
           <i className="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search Products..." autoFocus />
-          <button
-            className="close-btn"
-            onClick={() => setSearchActive(false)}
-          >
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="clear-search-btn"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              <i className="fa-solid fa-circle-xmark"></i>
+            </button>
+          )}
+          <button type="submit" className="search-submit-btn" disabled={!searchQuery.trim()}>
+            Search
+          </button>
+          <button type="button" className="close-btn" onClick={closeSearch}>
             <i className="fa-solid fa-xmark"></i>
           </button>
-        </div>
+        </form>
       </div>
-
     </>
   );
 };

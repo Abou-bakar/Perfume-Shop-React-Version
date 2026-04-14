@@ -20,9 +20,11 @@ import AllProducts from './pages/AllProducts';
 import AddProduct from './pages/AddProduct';
 import ManageProducts from './pages/ManageProducts';
 import ManageOrders from './pages/ManageOrders';
+import ManageInventory from './pages/ManageInventory';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 function App() {
   const location = useLocation();
@@ -70,7 +72,9 @@ function App() {
             <Route path='/admin' element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path='/add-product' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
             <Route path='/manage-products' element={<ProtectedRoute><ManageProducts /></ProtectedRoute>} />
+            <Route path='/manage-inventory' element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
             <Route path='/manage-orders' element={<ProtectedRoute><ManageOrders /></ProtectedRoute>} />
+            <Route path='/analytics' element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
           </Route>
 
           {/* 404 Page */}
