@@ -1,129 +1,201 @@
 import { useCart } from '../context/CartContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import '../styles/checkout.css'
-import { image } from 'framer-motion/client';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import '../styles/checkout.css';
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const SHIPPING_COST = 250;
+
+const PHONE_REGEX = /^3[0-9]{9}$/;
+
+// ─── Validation Schema ────────────────────────────────────────────────────────
+
+const checkoutSchema = Yup.object({
+    // Contact
+    email: Yup.string()
+        .required('Email is required')
+        .matches(
+            /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            'Enter a valid email'
+        ),
+
+    // Delivery
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
+    address: Yup.string().required('Address is required'),
+    city: Yup.string().required('City is required'),
+    postalCode: Yup.string()
+        .matches(/^[0-9]{4,6}$/, 'Invalid postal code')
+        .nullable(),
+    phone: Yup.string()
+        .required('Phone is required')
+        .matches(PHONE_REGEX, 'Invalid phone number'),
+
+    // Payment
+    paymentMethod: Yup.string().required('Select payment method'),
+
+    // Billing
+    billingAddressType: Yup.string().required(),
+    billingFirstName: Yup.string().when('billingAddressType', {
+        is: 'different',
+        then: (schema) => schema.required('First name required'),
+    }),
+    billingLastName: Yup.string().when('billingAddressType', {
+        is: 'different',
+        then: (schema) => schema.required('Last name required'),
+    }),
+    billingCity: Yup.string().when('billingAddressType', {
+        is: 'different',
+        then: (schema) => schema.required('City required'),
+    }),
+    billingPhone: Yup.string().when('billingAddressType', {
+        is: 'different',
+        then: (schema) =>
+            schema.required('Phone required').matches(PHONE_REGEX, 'Invalid phone'),
+    }),
+});
+
+// ─── Initial Values ───────────────────────────────────────────────────────────
+
+const initialValues = {
+    email: '',
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    phone: '',
+    paymentMethod: 'cod',
+    billingAddressType: 'same',
+    billingFirstName: '',
+    billingLastName: '',
+    billingAddress: '',
+    billingCity: '',
+    billingPostalCode: '',
+    billingPhone: '',
+};
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
+
+const getItemImage = (item) =>
+    Array.isArray(item.images) ? item.images[0] : item.image;
+
+// ─── FieldError Component ─────────────────────────────────────────────────────
+
+const FieldError = ({ touched, error }) =>
+    touched && error ? <span className="error">{error}</span> : null;
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const Checkout = () => {
     const { cartItems, getCartTotal } = useCart();
     const navigate = useNavigate();
-    const [submitting, setSubmitting] = useState(false);
+    const location = useLocation();
 
-    const [formData, setFormData] = useState({
-        email: '',
-        firstName: '',
-        lastName: '',
-        address: '',
-        city: '',
-        postalCode: '',
-        phone: "",
-        paymentMethod: 'cod',
-        billingAddressType: 'same'
-    })
-
-    // Redirect if cart is empty
-    useEffect(() => {
-        if (cartItems.length === 0) {
-            navigate('/');
-        }
-    }, [cartItems, navigate]);
-
-    const handleInputChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        })
-    }
-
-    const shippingCost = 250;
     const subTotal = getCartTotal();
-    const total = subTotal + shippingCost;
+    const total = subTotal + SHIPPING_COST;
 
-    const handleCompleteOrder = async () => {
-        // Validate required fields
-        if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.phone) {
-            toast.error('Please fill in all required fields');
-            return;
-        };
+    // ── Hooks must be called unconditionally ──────────────────────────────────
 
-        setSubmitting(true);
+    const formik = useFormik({
+        initialValues,
+        validationSchema: checkoutSchema,
+        onSubmit: handleSubmit,
+    });
 
+    const orderSubmitted = useRef(false)
+
+    // Redirect if cart is empty — after hooks
+    useEffect(() => {
+        if (cartItems.length === 0) navigate('/');
+    }, []);
+
+
+    // ── Submit handler ────────────────────────────────────────────────────────
+
+    async function handleSubmit(values, { setSubmitting }) {
         try {
-            // Generate order number
-            const orderNumber = Math.floor(10000 + Math.random() * 90000)
+            // ── Normalize phone numbers ──────────────────────────────────
+            const normalizePhone = (val) =>
+                '+92' + val.replace(/^(\+?92|0)/, '');  // arrow, no braces = implicit return
 
-            // Prepare order details for Firestore
+            const normalizedValues = {
+                ...values,
+                phone: normalizePhone(values.phone),
+                billingPhone: values.billingPhone
+                    ? normalizePhone(values.billingPhone)
+                    : '',
+            };
+            // ─────────────────────────────────────────────────────────────
+
+            const orderNumber = Math.floor(10000 + Math.random() * 90000);
+
             const orderData = {
                 orderNumber,
                 customerInfo: {
-                    email: formData.email,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    address: formData.address,
-                    city: formData.city,
-                    postalCode: formData.postalCode,
-                    phone: formData.phone
+                    email: normalizedValues.email,
+                    firstName: normalizedValues.firstName,
+                    lastName: normalizedValues.lastName,
+                    address: normalizedValues.address,
+                    city: normalizedValues.city,
+                    postalCode: normalizedValues.postalCode || null,
+                    phone: normalizedValues.phone,       // ← +92XXXXXXXXXX
                 },
-                items: cartItems.map(item => ({
+                items: cartItems.map((item) => ({
                     id: item.id,
                     productName: item.productName,
                     price: item.price,
-                    discountedPrice: item.discountedPrice || null,
-                    isSale: item.isSale || false,
+                    discountedPrice: item.discountedPrice ?? null,
+                    isSale: item.isSale ?? false,
                     quantity: item.quantity,
-                    selectedSize: item.selectedSize || null,
-                    image: Array.isArray(item.images) ? item.images[0] : item.image
+                    selectedSize: item.selectedSize ?? null,
+                    image: getItemImage(item),
                 })),
                 subTotal,
-                shipping: shippingCost,
+                shipping: SHIPPING_COST,
                 total,
-                paymentMethod: formData.paymentMethod,
-                billingAddressType: formData.billingAddressType,
-                status: 'pending', // pending, confirmed, shipped, delivered, cancelled
+                paymentMethod: normalizedValues.paymentMethod,
+                billingAddressType: normalizedValues.billingAddressType,
+                status: 'pending',
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
             };
 
-            // Save order to Firestore
-            const ordersRef = collection(db, "orders");
+            const ordersRef = collection(db, 'orders');
             const docRef = await addDoc(ordersRef, orderData);
+            console.log('Order saved with ID:', docRef.id);
 
-            console.log("Order saved with ID:", docRef.id);
-
-            // Prepare order details for session storage (for confirmation page)
             const orderDetails = {
                 orderNumber,
                 items: cartItems,
-                formData,
+                values: normalizedValues,               // ← confirmation page gets +92
                 subTotal,
-                shipping: shippingCost,
+                shipping: SHIPPING_COST,
                 total,
-                orderData: new Date().toISOString()
+                orderDate: new Date().toISOString(),
             };
 
-            // Save to sessionStorage for confirmation page
             sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
-
-            // Show success message
             toast.success('Order placed successfully!');
-
-            // Navigate to confirmation page
-            navigate('/order-confirmation')
-
+            navigate('/order-confirmation', { state: { fromCheckout: true } });
         } catch (error) {
-            console.error("Error saving order:", error);
+            console.error('Error saving order:', error);
             toast.error('Failed to place order. Please try again.');
         } finally {
             setSubmitting(false);
         }
-    };
-
-    if (cartItems.length === 0) {
-        return null;
     }
+
+    const { values, touched, errors, handleChange, handleBlur, handleSubmit: onSubmit, isSubmitting } = formik;
+    const isDifferentBilling = values.billingAddressType === 'different';
+
+    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <>
@@ -131,239 +203,341 @@ const Checkout = () => {
                 <Link to="/" aria-label="Go to home">
                     <h2>Perfumes Mists</h2>
                 </Link>
-                <i className="fa-solid fa-bag-shopping"></i>
+                <i className="fa-solid fa-bag-shopping" />
             </nav>
-            <div className="checkout-wrapper">
-                <div className="checkout-left">
-                    <section className="checkout-section">
-                        <h3>Contact</h3>
-                        <input
-                            type="text"
-                            name='email'
-                            placeholder="Email or phone number"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </section>
 
-                    <section className="checkout-section">
-                        <h3>Delivery</h3>
-                        <div className="name">
-                            <input
-                                type="text"
-                                name='firstName'
-                                placeholder="First Name"
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name='lastName'
-                                placeholder="Last Name"
-                                value={formData.lastName}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                        <input
-                            type="text"
-                            name='address'
-                            placeholder="Address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <div className="citycode">
-                            <input
-                                type="text"
-                                name='city'
-                                placeholder="City"
-                                value={formData.city}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name='postalCode'
-                                placeholder="Postal Code"
-                                value={formData.postalCode}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                        <input
-                            type="text"
-                            name='phone'
-                            placeholder="Phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </section>
+            <form onSubmit={onSubmit}>
+                <div className="checkout-wrapper">
 
-                    <section className="checkout-section">
-                        <h3>Shipping Method</h3>
-                        <div className="accordion-shipping">
-                            <label>
-                                <input type="radio" name="shipping" defaultChecked />
-                                <span>Standard Rs. {shippingCost}</span>
-                            </label>
-                        </div>
-                    </section>
+                    {/* ── Left Column ── */}
+                    <div className="checkout-left">
 
-                    <section className="checkout-section accordion">
-                        <h3>Payment</h3>
-
-                        {/* COD */}
-                        <div className="accordion-item-checkout">
-                            <label className="accordion-header-checkout">
+                        {/* Email */}
+                        <section className="checkout-section">
+                            <h3>Email</h3>
+                            <div className='floating-input'>
                                 <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="cod"
-                                    checked={formData.paymentMethod === 'cod'}
-                                    onChange={handleInputChange}
+                                    type="email"
+                                    name="email"
+                                    placeholder=""
+                                    value={values.email}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    autoComplete="email"
                                 />
-                                <span>Cash on Delivery (COD)</span>
-                            </label>
-
-                            <div
-                                className={`accordion-content-checkout ${formData.paymentMethod === 'cod' ? 'open' : ''
-                                    }`}
-                            >
-                                <p>You can pay in cash when your order arrives.</p>
-                                <p><strong>Estimated Delivery:</strong> 3–5 working days.</p>
+                                <label>Email</label>
                             </div>
-                        </div>
+                            <FieldError touched={touched.email} error={errors.email} />
+                        </section>
 
-                        {/* BANK */}
-                        <div className="accordion-item-checkout">
-                            <label className="accordion-header-checkout">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="bank"
-                                    checked={formData.paymentMethod === 'bank'}
-                                    onChange={handleInputChange}
-                                />
-                                <span>Bank Deposit</span>
-                            </label>
-
-                            <div
-                                className={`accordion-content-checkout ${formData.paymentMethod === 'bank' ? 'open' : ''
-                                    }`}
-                            >
-                                <p>
-                                    Transfer the amount to our bank account and upload payment proof.
-                                </p>
-
-                                <ul>
-                                    <li><strong>Bank:</strong> Meezan Bank</li>
-                                    <li><strong>Account Title:</strong> XYZ</li>
-                                    <li><strong>Account No:</strong> 1234567890</li>
-                                    <li><strong>IBAN:</strong> PK12MEZN1234567890</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="checkout-section accordion">
-                        <h3>Billing Address</h3>
-
-                        <div className="accordion-item-checkout non-expandable">
-                            <label className="accordion-header-checkout">
-                                <input
-                                    type="radio"
-                                    name="billingAddressType"
-                                    value="same"
-                                    checked={formData.billingAddressType === 'same'}
-                                    onChange={handleInputChange}
-                                />
-                                <span>Same as shipping address</span>
-                            </label>
-                        </div>
-
-                        <div className="accordion-item-checkout">
-                            <label className="accordion-header-checkout">
-                                <input
-                                    type="radio"
-                                    name="billingAddressType"
-                                    value="different"
-                                    checked={formData.billingAddressType === 'different'}
-                                    onChange={handleInputChange}
-                                />
-                                <span>Use a different billing address</span>
-                            </label>
-
-                            <div
-                                className={`accordion-content-checkout ${formData.billingAddressType === 'different' ? 'open' : ''
-                                    }`}
-                            >
-                                <form className="billing-form">
-                                    <div className="name">
-                                        <input type="text" placeholder="First Name" />
-                                        <input type="text" placeholder="Last Name" />
-                                    </div>
-
-                                    <input type="text" placeholder="Address" />
-
-                                    <div className="citycode">
-                                        <input type="text" placeholder="City" />
-                                        <input type="text" placeholder="Postal Code" />
-                                    </div>
-
-                                    <input type="text" placeholder="Phone" />
-                                </form>
-                            </div>
-                        </div>
-                    </section>
-
-                    <button
-                        className="complete-order"
-                        onClick={handleCompleteOrder}
-                        disabled={submitting}
-                        style={{
-                            opacity: submitting ? 0.6 : 1,
-                            cursor: submitting ? 'not-allowed' : 'pointer'
-                        }}
-                    >
-                        {submitting ? 'Processing...' : 'Complete Order'}
-                    </button>
-                </div>
-
-                <div className="checkout-right">
-                    <div className="order-items">
-                        {cartItems.map((item) => (
-                            <div key={item.id} className='order-item'>
-                                <img
-                                    src={Array.isArray(item.images) ? item.images[0] : item.image}
-                                    alt={item.productName}
-                                />
-                                <div className='order-item-details'>
-                                    <h4>{item.productName}</h4>
-                                    {item.selectedSize && <p>Size: {item.selectedSize}</p>}
-                                    <p>Qty: {item.quantity}</p>
+                        {/* Delivery */}
+                        <section className="checkout-section">
+                            <h3>Delivery</h3>
+                            <div className="name">
+                                <div className='floating-input'>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        placeholder=""
+                                        value={values.firstName}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        autoComplete="given-name"
+                                    />
+                                    <label>First Name</label>
                                 </div>
-                                <p className='order-item-price'>
-                                    Rs. {((item.isSale ? item.discountedPrice : item.price) * item.quantity).toLocaleString('en-PK')}
-                                </p>
+                                <FieldError touched={touched.firstName} error={errors.firstName} />
+                                <div className='floating-input'>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        placeholder=""
+                                        value={values.lastName}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        autoComplete="family-name"
+                                    />
+                                    <label>Last Name</label>
+                                </div>
+                                <FieldError touched={touched.lastName} error={errors.lastName} />
                             </div>
-                        ))}
+                            <div className='floating-input'>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    placeholder=""
+                                    value={values.address}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    autoComplete="street-address"
+                                />
+                                <label>Address</label>
+                            </div>
+                            <FieldError touched={touched.address} error={errors.address} />
+
+                            <div className="citycode">
+                                <div className='floating-input'>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder=""
+                                        value={values.city}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        autoComplete="address-level2"
+                                    />
+                                    <label>City</label>
+                                </div>
+                                <FieldError touched={touched.city} error={errors.city} />
+                                <div className='floating-input'>
+                                    <input
+                                        type="text"
+                                        name="postalCode"
+                                        placeholder=""
+                                        value={values.postalCode}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        autoComplete="postal-code"
+                                    />
+                                    <label>Postal Code</label>
+                                </div>
+                                <FieldError touched={touched.postalCode} error={errors.postalCode} />
+                            </div>
+                            <div className='floating-input phone-input'>
+                                <span className='phone-prefix'>+92</span>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder=""
+                                    value={values.phone}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    autoComplete="tel"
+                                />
+                                {/* <label>Phone</label> */}
+                            </div>
+                            <FieldError touched={touched.phone} error={errors.phone} />
+                        </section>
+
+                        {/* Shipping Method */}
+                        <section className="checkout-section">
+                            <h3>Shipping Method</h3>
+                            <div className="accordion-shipping">
+                                <label>
+                                    <input type="radio" name="shipping" defaultChecked readOnly />
+                                    <span>Standard — Rs. {SHIPPING_COST}</span>
+                                </label>
+                            </div>
+                        </section>
+
+                        {/* Payment */}
+                        <section className="checkout-section accordion">
+                            <h3>Payment</h3>
+
+                            {/* COD */}
+                            <div className="accordion-item-checkout">
+                                <label className="accordion-header-checkout">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="cod"
+                                        checked={values.paymentMethod === 'cod'}
+                                        onChange={handleChange}
+                                    />
+                                    <span>Cash on Delivery (COD)</span>
+                                </label>
+                                <div className={`accordion-content-checkout ${values.paymentMethod === 'cod' ? 'open' : ''}`}>
+                                    <p>You can pay in cash when your order arrives.</p>
+                                    <p><strong>Estimated Delivery:</strong> 3–5 working days.</p>
+                                </div>
+                            </div>
+
+                            {/* Bank */}
+                            <div className="accordion-item-checkout">
+                                <label className="accordion-header-checkout">
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="bank"
+                                        checked={values.paymentMethod === 'bank'}
+                                        onChange={handleChange}
+                                    />
+                                    <span>Bank Deposit</span>
+                                </label>
+                                <div className={`accordion-content-checkout ${values.paymentMethod === 'bank' ? 'open' : ''}`}>
+                                    <p>Transfer the amount to our bank account and upload payment proof.</p>
+                                    <ul>
+                                        <li><strong>Bank:</strong> Meezan Bank</li>
+                                        <li><strong>Account Title:</strong> XYZ</li>
+                                        <li><strong>Account No:</strong> 1234567890</li>
+                                        <li><strong>IBAN:</strong> PK12MEZN1234567890</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Billing Address */}
+                        <section className="checkout-section accordion">
+                            <h3>Billing Address</h3>
+
+                            <div className="accordion-item-checkout non-expandable">
+                                <label className="accordion-header-checkout">
+                                    <input
+                                        type="radio"
+                                        name="billingAddressType"
+                                        value="same"
+                                        checked={values.billingAddressType === 'same'}
+                                        onChange={handleChange}
+                                    />
+                                    <span>Same as shipping address</span>
+                                </label>
+                            </div>
+
+                            <div className="accordion-item-checkout">
+                                <label className="accordion-header-checkout">
+                                    <input
+                                        type="radio"
+                                        name="billingAddressType"
+                                        value="different"
+                                        checked={isDifferentBilling}
+                                        onChange={handleChange}
+                                    />
+                                    <span>Use a different billing address</span>
+                                </label>
+
+                                <div className={`accordion-content-checkout ${isDifferentBilling ? 'open' : ''}`}>
+                                    <div className="billing-form">
+                                        <div className="name">
+                                            <div className='floating-input'>
+                                                <input
+                                                    type="text"
+                                                    name="billingFirstName"
+                                                    placeholder=""
+                                                    value={values.billingFirstName}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <label>First Name</label>
+                                            </div>
+                                            <FieldError touched={touched.billingFirstName} error={errors.billingFirstName} />
+                                            <div className='floating-input'>
+                                                <input
+                                                    type="text"
+                                                    name="billingLastName"
+                                                    placeholder=""
+                                                    value={values.billingLastName}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <label>Last Name</label>
+                                            </div>
+                                            <FieldError touched={touched.billingLastName} error={errors.billingLastName} />
+                                        </div>
+                                        <div className='floating-input'>
+                                            <input
+                                                type="text"
+                                                name="billingAddress"
+                                                placeholder=""
+                                                value={values.billingAddress}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                            />
+                                            <label>Address</label>
+                                        </div>
+                                        <FieldError touched={touched.billingAddress} error={errors.billingAddress} />
+
+                                        <div className="citycode">
+                                            <div className='floating-input'>
+                                                <input
+                                                    type="text"
+                                                    name="billingCity"
+                                                    placeholder=""
+                                                    value={values.billingCity}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <label>City</label>
+                                            </div>
+                                            <FieldError touched={touched.billingCity} error={errors.billingCity} />
+                                            <div className='floating-input'>
+                                                <input
+                                                    type="text"
+                                                    name="billingPostalCode"
+                                                    placeholder=""
+                                                    value={values.billingPostalCode}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                                <label>Postal Code</label>
+                                            </div>
+                                            <FieldError touched={touched.billingPostalCode} error={errors.billingPostalCode} />
+                                        </div>
+                                        <div className='floating-input phone-input'>
+                                            <span className='phone-prefix'>+92</span>
+                                            <input
+                                                type="tel"
+                                                name="billingPhone"
+                                                placeholder=""
+                                                value={values.billingPhone}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                            />
+                                            {/* <label>Phone</label> */}
+                                        </div>
+                                        <FieldError touched={touched.billingPhone} error={errors.billingPhone} />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <button
+                            type="submit"
+                            className="complete-order"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Processing...' : 'Complete Order'}
+                        </button>
                     </div>
 
-                    <div className="order-summary">
-                        <p>Subtotal: Rs. {subTotal.toLocaleString('en-PK')}</p>
-                        <p>Shipping: Rs. {shippingCost.toLocaleString('en-PK')}</p>
-                        <hr style={{ margin: '10px 0', border: '1px solid #eee' }} />
-                        <p style={{ fontWeight: 'bold', fontSize: '18px' }}>
-                            Total: Rs. {total.toLocaleString('en-PK')}
-                        </p>
+                    {/* ── Right Column ── */}
+                    <div className="checkout-right">
+                        <div className="order-items">
+                            {cartItems.map((item) => {
+                                const itemPrice = item.isSale ? item.discountedPrice : item.price;
+                                return (
+                                    <div key={item.id} className="order-item">
+                                        <img
+                                            src={getItemImage(item)}
+                                            alt={item.productName}
+                                            loading="lazy"
+                                        />
+                                        <div className="order-item-details">
+                                            <h4>{item.productName}</h4>
+                                            {item.selectedSize && <p>Size: {item.selectedSize}</p>}
+                                            <p>Qty: {item.quantity}</p>
+                                        </div>
+                                        <p className="order-item-price">
+                                            Rs. {(itemPrice * item.quantity).toLocaleString('en-PK')}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="order-summary">
+                            <p>Subtotal: Rs. {subTotal.toLocaleString('en-PK')}</p>
+                            <p>Shipping: Rs. {SHIPPING_COST.toLocaleString('en-PK')}</p>
+                            <hr style={{ margin: '10px 0', border: '1px solid #eee' }} />
+                            <p style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                                Total: Rs. {total.toLocaleString('en-PK')}
+                            </p>
+                        </div>
                     </div>
+
                 </div>
-            </div>
+            </form>
         </>
-    )
-}
+    );
+};
 
-export default Checkout
+export default Checkout;

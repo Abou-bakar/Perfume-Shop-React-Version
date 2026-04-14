@@ -1,10 +1,17 @@
+/* ─── Nav ─────────────────────────────────────────────────────────────────── */
+
 .checkout-nav {
   background: white;
   color: black;
-  height: 4vh;
+  height: 56px;               /* fixed px instead of fragile 4vh */
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .checkout-nav a {
@@ -13,203 +20,342 @@
 }
 
 .checkout-nav h2 {
-   font-size: clamp(14px, 1.5vw, 18px);
+  font-size: clamp(14px, 1.5vw, 18px);
+  margin: 0;
 }
 
 .checkout-nav i {
-  font-size: 30px;
+  font-size: 22px;
   cursor: pointer;
 }
+
+/* ─── Layout ──────────────────────────────────────────────────────────────── */
 
 .checkout-wrapper {
   display: flex;
   width: 100%;
   min-height: 100vh;
-  border: 1px solid #ddd;
+  background: #f8f8f8;
 }
 
 .checkout-left {
   flex: 1;
   background: #fff;
-  padding: 40px;
+  padding: 40px 50px;
+  box-sizing: border-box;
+  /* remove overflow issues */
+}
+
+.checkout-right {
+  flex: 0 0 380px;            /* fixed width instead of flex: 0.8 which was inconsistent */
+  position: sticky;
+  top: 56px;                  /* matches nav height */
+  height: calc(100vh - 56px);
+  overflow-y: auto;           /* scroll independently if content overflows */
+  background: #f4f4f4;
+  border-left: 1px solid #e5e5e5;
+  padding: 32px 28px;
   box-sizing: border-box;
 }
 
+/* ─── Sections ────────────────────────────────────────────────────────────── */
+
 .checkout-left .checkout-section {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fff;
+  transition: box-shadow 0.2s ease;
+}
+
+.checkout-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .checkout-left h3 {
-  margin-bottom: 10px;
-  font-size: 20px;
-  padding-bottom: 5px;
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
 }
 
-.checkout-section .name {
-  display: flex;
-  gap: 10px;
-}
+/* ─── Name / City-Code rows ───────────────────────────────────────────────── */
 
+.checkout-section .name,
 .checkout-section .citycode {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: flex-start;   /* align tops so error text doesn't misalign columns */
 }
 
-.checkout-section input[type="text"],
-.checkout-section input[type="email"] {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
+.checkout-section .name > *,
+.checkout-section .citycode > * {
+  flex: 1;
+  min-width: 0;              /* prevent overflow when content is wide */
 }
+
+.phone-input {
+  position: relative;
+}
+
+.phone-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #111;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+.phone-input input {
+  padding: 12px 12px 12px 48px !important;
+}
+
+.phone-input label {
+  left: 48px;
+}
+
+.phone-input input:focus + label,
+.phone-input input:not(:placeholder-shown) + label {
+  left: 12px;
+  top: 10px;
+  transform: translateY(0);
+  font-size: 11px;
+  color: #555;
+}
+
+/* ─── Floating Label Inputs ───────────────────────────────────────────────── */
+
+.floating-input {
+  position: relative;
+  margin-bottom: 6px;        /* reduced — .error below adds its own spacing */
+  width: 100%;
+}
+
+.floating-input input {
+  width: 100%;
+  padding: 18px 12px 6px 12px;   /* top padding makes room for the floated label */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  /* remove margin-bottom — parent .floating-input handles spacing */
+  margin-bottom: 0;
+}
+
+.floating-input label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #999;
+  pointer-events: none;
+  transition: top 0.18s ease, font-size 0.18s ease, color 0.18s ease;
+  background: transparent;
+  padding: 0 2px;
+}
+
+/* Floated state — label moves up when input is focused or has value */
+.floating-input input:focus + label,
+.floating-input input:not(:placeholder-shown) + label {
+  top: 10px;
+  transform: translateY(0);
+  font-size: 11px;
+  color: #555;
+}
+
+.floating-input input:focus {
+  border-color: #111;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.floating-input input:hover:not(:focus) {
+  border-color: #aaa;
+}
+
+/* ─── Error messages ──────────────────────────────────────────────────────── */
+
+.error {
+  display: block;
+  color: #e53935;
+  font-size: 12px;
+  margin: 4px 0 10px 2px;
+  line-height: 1.3;
+}
+
+.input-error {
+  border-color: #e53935 !important;
+  background: #fff5f5 !important;
+}
+
+/* ─── Radio labels ────────────────────────────────────────────────────────── */
 
 .checkout-left label {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .checkout-left input[type="radio"] {
-  /* appearance: none; */
-  width: 18px;
-  height: 18px;
-  border: 2px solid #666;
-  border-radius: 50%;
-  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: black;
   cursor: pointer;
+  /* cancel the generic input padding/margin from .checkout-section input */
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
 }
 
-/* .checkout-left input[type="radio"]:checked::before {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  top: 2px;
-  left: 2px;
-  background: black;
-  border-radius: 50%;
-} */
+/* ─── Shipping accordion ──────────────────────────────────────────────────── */
+
+.accordion-shipping {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #f2f2f2;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* ─── Payment / Billing accordions ───────────────────────────────────────── */
 
 .accordion-item-checkout {
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
   margin-bottom: 10px;
   overflow: hidden;
-  background: #f2f2f2;
+  background: #fafafa;
+  transition: border-color 0.2s ease;
 }
 
-.accordion-header-checkout,
-.accordion-content-checkout {
-  background: none;
+.accordion-item-checkout:last-child {
+  margin-bottom: 0;
 }
 
 .accordion-header-checkout {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: 14px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .accordion-content-checkout {
   max-height: 0;
   overflow: hidden;
-  padding: 0 20px;
   background: #fff;
-   will-change: max-height;
   transition: max-height 0.35s ease, padding 0.35s ease;
 }
 
 .accordion-content-checkout.open {
-  max-height: 500px; /* enough for content */
-  padding: 20px;
+  max-height: 600px;
+  padding: 16px 20px 20px;
 }
 
-.accordion-shipping {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px;
-  background: #f2f2f2;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+.accordion-content-checkout p,
+.accordion-content-checkout ul {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
 }
 
-.billing-form input {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.accordion-content-checkout ul {
+  padding-left: 18px;
 }
+
+.accordion-content-checkout li {
+  margin-bottom: 4px;
+}
+
+/* ─── Billing sub-form ────────────────────────────────────────────────────── */
+
+.billing-form {
+  margin-top: 4px;
+}
+
+/* Billing form reuses .floating-input — no extra rules needed */
+
+/* ─── Submit button ───────────────────────────────────────────────────────── */
 
 .complete-order {
-  background: black;
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px;
+  background: #111;
   color: white;
   border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  border: 1px solid black;
+  border-radius: 8px;
   cursor: pointer;
-  width: 100%;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-.complete-order:hover {
-  background: white;
-  color: black;
-  border: 1px solid black;
+.complete-order:hover:not(:disabled) {
+  background: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-.checkout-right {
-  flex: 0.8;
-  position: sticky;
-  background: hsl(0deg 0% 96.47%);
-  border-left: 2px solid #ddd;
-  padding: 40px;
-  box-sizing: border-box;
+.complete-order:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: none;
 }
+
+.complete-order:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Order items (right panel) ───────────────────────────────────────────── */
 
 .order-items {
- margin-bottom: 20px;
-  max-height: 400px;
-  overflow-y: auto;
+  margin-bottom: 20px;
 }
+
+/* No max-height / overflow on order-items — the panel itself scrolls */
 
 .order-item {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  align-items: center;
-}
-
-.order-item-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
-  padding: 8px 0;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: white;
+  border: 1px solid #eee;
+  transition: box-shadow 0.2s ease;
 }
 
-.order-item-content p {
-  flex: 1; /* makes it expand to fill space */
-  margin: 0 10px;
-  text-align: left;
-  font-size: 15px;
+.order-item:last-child {
+  margin-bottom: 0;
 }
 
-.order-item-content span {
-  font-weight: 600;
-  font-size: 15px;
-  white-space: nowrap;
+.order-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
 }
 
 .order-item img {
@@ -217,48 +363,110 @@
   height: 60px;
   object-fit: cover;
   border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .order-item-details {
   flex: 1;
+  min-width: 0;
 }
 
 .order-item-details h4 {
-  margin: 0 0 5px 0;
-  font-size: 14px;
+  margin: 0 0 4px 0;
+  font-size: 13px;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .order-item-details p {
   margin: 2px 0;
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #888;
 }
 
 .order-item-price {
   font-weight: 600;
-  color: #666;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
+
+/* ─── Order summary ───────────────────────────────────────────────────────── */
 
 .order-summary {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  margin-top: 16px;
 }
 
+/* Fix: each summary row is its own flex row via a wrapper — but since JSX
+   uses bare <p> tags, we target them directly and make each a flex row */
 .order-summary p {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 10px 0;
-  font-size: 15px;
+  font-size: 14px;
+  color: #444;
+  /* The JSX puts both label and value as a single text node like:
+     "Subtotal: Rs. 1,000"  — this is fine as plain text,
+     but if you later split them into <span> children, flex will
+     space-between them automatically. */
 }
+
+.order-summary p:last-child {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #eee;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
   .checkout-wrapper {
     flex-direction: column;
   }
+
+  .checkout-left {
+    padding: 24px 20px;
+  }
+
   .checkout-right {
+    flex: none;
+    width: 100%;
+    position: static;         /* no sticky on mobile — stacks below form */
+    height: auto;
+    overflow-y: visible;
     border-left: none;
     border-top: 2px solid #ddd;
+    padding: 24px 20px;
+  }
+
+  .checkout-section .name,
+  .checkout-section .citycode {
+    flex-direction: column;
+    gap: 0;
   }
 }
+
+@media (max-width: 480px) {
+  .checkout-left {
+    padding: 16px;
+  }
+
+  .checkout-right {
+    padding: 16px;
+  }
+
+  .checkout-nav {
+    padding: 0 16px;
+  }
+} 
