@@ -2,22 +2,23 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
-
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import "../styles/login.css";
 import logo from "../assets/images/logo.png";
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false)
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      setLoading(true);
       await login(email, password);
       toast.success('Login successful!');
       navigate('/admin')
@@ -50,10 +51,10 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
-            <div className="form-group">
+            <div className="form-group-login">
               <input
                 type="email"
-                placeholder="your@email.com"
+                placeholder="your@perfumesmists.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -61,15 +62,24 @@ const Login = () => {
               />
             </div>
             
-            <div className="form-group">
+            <div className="password-wrapper">
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="form-input"
               />
+
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ?<FiEyeOff /> : <FiEye />}
+              </button>
             </div>
 
             <button
