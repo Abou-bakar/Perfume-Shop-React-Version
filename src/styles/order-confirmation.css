@@ -1,232 +1,341 @@
+/* ─── Layout ──────────────────────────────────────────────────────────────── */
+
 .order-wrapper {
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 56px); /* account for nav height */
+  background: #f8f8f8;
 }
 
 .order-left {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 24px;
   background: #fff;
-  padding: 0 40px;
-  border-right: 2px solid #eee;
+  padding: 40px 50px;
+  box-sizing: border-box;
+  border-right: 1px solid #e5e5e5;
 }
+
+.order-right {
+  flex: 0 0 360px;              /* fixed width, not flex:1 competing with left */
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: 36px 28px;
+  box-sizing: border-box;
+  background: #f4f4f4;
+}
+
+/* ─── Price banner ────────────────────────────────────────────────────────── */
 
 .order-section-price {
   display: flex;
   justify-content: space-between;
-  /* background: #f2f2f2; */
-  /* width: 100%; */
-  padding: 20px;
-  border-bottom: 1px solid #666;
+  align-items: center;
+  padding: 14px 20px;
+  background: #f9f9f9;
+  border: 1px solid #e5e5e5;   /* was #666 — too dark */
+  border-radius: 8px;
+  font-size: 14px;
+  color: #444;
 }
+
+.order-section-price p {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.order-section-price p:last-child {
+  font-weight: 600;
+  color: #111;
+  font-size: 15px;
+}
+
+/* ─── Order number + thank you ────────────────────────────────────────────── */
 
 .order-section-orderno {
   display: flex;
-  justify-content: flex-start;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  background: #f0faf4;
+  border: 1px solid #c3e6cb;
+  border-radius: 10px;
 }
 
 .order-section-orderno i {
-  font-size: 60px;
+  font-size: 44px;              /* was 60px — oversized */
   color: #28a745;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.order-section-orderno p {
-  color: #666;
-  margin-bottom: 6px;
+.orderno p {
+  color: #555;
+  font-size: 13px;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
-.order-section-orderno h1 {
-  font-weight: 200;
-  font-size: 24px;
-  margin: 5px 0 0;
+.orderno h1 {
+  font-weight: 400;             /* was 200 — too thin */
+  font-size: 26px;
+  margin: 0;
+  color: #111;
+  line-height: 1.2;
 }
+
+/* ─── Map section ─────────────────────────────────────────────────────────── */
 
 .order-section-map {
-  text-align: justify;
+  text-align: left;             /* was justify — looks odd on short text */
 }
 
 .order-section-map iframe {
   width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  height: 280px;
+  border-radius: 10px;
+  display: block;               /* removes inline bottom gap */
+  margin-bottom: 16px;
 }
 
 .order-section-map h3 {
-  font-size: 20px;
-  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #111;
 }
 
 .order-section-map p {
   font-size: 14px;
   color: #666;
-  margin-bottom: 40px;
+  margin: 0;
+  line-height: 1.6;
 }
 
+/* ─── Order items ─────────────────────────────────────────────────────────── */
+
 .order-items-section {
-  margin-top: 30px;
   padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 10px;
 }
 
 .order-items-section h3 {
-  margin-bottom: 20px;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #111;
 }
 
 .ordered-products {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .ordered-product {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  background-color: white;
-  border-radius: 6px;
   align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #eee;      /* added border for visual separation */
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.ordered-product:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
 .ordered-product img {
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   object-fit: cover;
   border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .ordered-product-details {
   flex: 1;
+  min-width: 0;
 }
 
 .ordered-product-details h4 {
-  margin: 0 0 5px 0;
-  font-size: 14px;
+  margin: 0 0 4px 0;
+  font-size: 13px;
   font-weight: 500;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ordered-product-details p {
   margin: 2px 0;
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #888;
 }
 
 .ordered-product-price {
   font-weight: 600;
+  font-size: 13px;
   color: #333;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Order Summary in sidebar */
+/* ─── Right sidebar: order details ───────────────────────────────────────── */
+
+.order-details {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.order-details h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  color: #111;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-details h4 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #999;
+  margin: 20px 0 8px 0;
+}
+
+.order-details h4:first-of-type {
+  margin-top: 0;
+}
+
+.order-details p {
+  color: #444;
+  font-size: 14px;
+  font-weight: 400;             /* was 200 — invisible on most screens */
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+}
+
+/* ─── Order summary totals ────────────────────────────────────────────────── */
+
 .order-summary-total {
   margin-top: 20px;
-  padding: 15px;
-  border-top: 2px solid #eee;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
 }
 
 .order-summary-total p {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 8px 0;
   font-size: 14px;
+  color: #444;
+  font-weight: 400;
 }
 
 .order-summary-total hr {
-  margin: 10px 0;
+  margin: 12px 0;
   border: none;
   border-top: 1px solid #ddd;
 }
 
 .order-summary-total .total {
   font-size: 16px;
-  font-weight: bold;
-  margin-top: 10px;
+  font-weight: 600;
+  color: #111;
+  margin-top: 4px;
 }
 
-.order-right {
-  flex: 1;
-  padding-left: 40px;
-}
-
-.order-details h3 {
-  font-size: 18px;
-  margin: 20px 0;
-}
-
-.order-details h4 {
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 12px;
-  margin-top: 20px;
-}
-
-.order-details p {
-  color: #666;
-  font-weight: 200;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.shopping {
-  display: flex;
-  padding: 20px 28px;
-  background: black;
-  color: white;
-  margin: 30px auto;
-  border: 1px solid black;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.shopping:hover {
-  background: white;
-  color: black;
-}
+/* ─── Continue shopping button ────────────────────────────────────────────── */
 
 .order-right a {
   text-decoration: none;
+  display: block;
 }
 
-@media (max-width: 576px) {
+.shopping {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  letter-spacing: 0.3px;
+}
+
+.shopping:hover {
+  background: #fff;
+  color: #111;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.shopping:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
   .order-wrapper {
     flex-direction: column;
-    /* padding: 20px; */
   }
 
   .order-left {
     border-right: none;
-    padding-right: 0;
-    padding-left: 0;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 30px;
-  }
-
-  .order-section-price {
-    display: flex;
-    justify-content: center;
-    gap: 40vw;
-  }
-
-  .order-section-orderno {
-    padding-left: 10px;
-  }
-
-  .order-section-map h3 {
-    padding-left: 10px;
-  }
-
-  .order-section-map p {
-    padding: 10px;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 24px 20px;
   }
 
   .order-right {
-    padding-left: 10px;
-    padding-right: 20px;
+    flex: none;
+    width: 100%;
+    position: static;
+    height: auto;
+    overflow-y: visible;
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-left {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .order-right {
+    padding: 16px;
+  }
+
+  .orderno h1 {
+    font-size: 22px;
+  }
+
+  .order-section-map iframe {
+    height: 200px;
   }
 }

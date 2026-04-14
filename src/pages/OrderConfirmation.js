@@ -8,31 +8,25 @@ const OrderConfirmation = () => {
   const { clearCart } = useCart();
   const [orderDetails, setOrderDetails] = useState(null);
 
-  useEffect(() => {
-    // Get order details from sessionStorage (set from checkout page)
+ useEffect(() => {
     const savedOrder = sessionStorage.getItem('orderDetails');
-    
     if (!savedOrder) {
-      // If no order details, redirect to home
-      navigate('/');
-      return;
+        navigate('/');
+        return;
     }
 
     const order = JSON.parse(savedOrder);
     setOrderDetails(order);
-
-    // Clear cart after successful order
+    // sessionStorage.removeItem('orderDetails');
     clearCart();
-
-    // Clear order details from sessionStorage after displaying
-    // sessionStorage.removeItem('orderDetails'); // Optional: keep for now
   }, [navigate, clearCart]);
 
-  if (!orderDetails) {
-    return null;
-  }
+  if (!orderDetails) return null;
 
-  const { orderNumber, items, formData, subTotal, shipping, total } = orderDetails;
+  // ── Fix: checkout saves as `values`, not `formData` ──────────────────────
+  const { orderNumber, items, values, subTotal, shipping, total } = orderDetails;
+
+  const isDifferentBilling = values?.billingAddressType === 'different';
 
   return (
     <>
@@ -40,24 +34,30 @@ const OrderConfirmation = () => {
         <Link to="/" aria-label="Go to home">
           <h2>Perfumes Mists</h2>
         </Link>
-        <i className="fa-solid fa-bag-shopping"></i>
+        <i className="fa-solid fa-bag-shopping" />
       </nav>
 
       <div className="order-wrapper">
+
+        {/* ── Left Column ── */}
         <div className="order-left">
+
+          {/* Amount banner */}
           <section className="order-section-price">
-            <p>Amount</p>
+            <p>Order Amount</p>
             <p>Rs. {total.toLocaleString('en-PK')}</p>
           </section>
 
+          {/* Thank you */}
           <section className="order-section-orderno">
-            <i className="fa-regular fa-circle-check"></i>
+            <i className="fa-regular fa-circle-check" />
             <div className="orderno">
               <p>Order #{orderNumber}</p>
-              <h1>Thank you, {formData.firstName}!</h1>
+              <h1>Thank you, {values?.firstName}!</h1>
             </div>
           </section>
 
+          {/* Map */}
           <section className="order-section-map">
             <div className="map-image">
               <iframe
@@ -67,11 +67,9 @@ const OrderConfirmation = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="location"
-              ></iframe>
+              />
               <h3>Your order is confirmed</h3>
-              <p>
-                You'll receive a confirmation email with your order number shortly.
-              </p>
+              <p>You'll receive a confirmation email with your order number shortly.</p>
             </div>
           </section>
 
@@ -81,14 +79,15 @@ const OrderConfirmation = () => {
             <div className="ordered-products">
               {items.map((item, index) => (
                 <div key={index} className="ordered-product">
-                  <img 
-                    src={Array.isArray(item.images) ? item.images[0] : item.image} 
-                    alt={item.productName} 
+                  <img
+                    src={Array.isArray(item.images) ? item.images[0] : item.image}
+                    alt={item.productName}
+                    loading="lazy"
                   />
                   <div className="ordered-product-details">
                     <h4>{item.productName}</h4>
                     {item.selectedSize && <p>Size: {item.selectedSize}</p>}
-                    <p>Quantity: {item.quantity}</p>
+                    <p>Qty: {item.quantity}</p>
                   </div>
                   <p className="ordered-product-price">
                     Rs. {((item.isSale ? item.discountedPrice : item.price) * item.quantity).toLocaleString('en-PK')}
@@ -97,49 +96,57 @@ const OrderConfirmation = () => {
               ))}
             </div>
           </section>
+
         </div>
 
+        {/* ── Right Column ── */}
         <div className="order-right">
           <div className="order-details">
             <h3>Order Details</h3>
 
-            <h4>Contact Information</h4>
-            <p>{formData.email}</p>
+            <h4>Contact</h4>
+            <p>{values?.email}</p>
 
             <h4>Shipping Address</h4>
-            <p>{formData.firstName} {formData.lastName}</p>
-            <p>{formData.address}</p>
-            <p>{formData.city} {formData.postalCode}</p>
+            <p>{values?.firstName} {values?.lastName}</p>
+            <p>{values?.address}</p>
+            <p>{values?.city}{values?.postalCode ? ` ${values.postalCode}` : ''}</p>
             <p>Pakistan</p>
-            {formData.phone && <p>{formData.phone}</p>}
+            {values?.phone && <p>{values.phone}</p>}
 
             <h4>Shipping Method</h4>
-            <p>Standard - Rs. {shipping.toLocaleString('en-PK')}</p>
+            <p>Standard — Rs. {shipping.toLocaleString('en-PK')}</p>
 
             <h4>Payment Method</h4>
             <p>
-              {formData.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Deposit'} 
-              {' - Rs. '}{total.toLocaleString('en-PK')}
+              {values?.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Deposit'}
+              {' — Rs. '}{total.toLocaleString('en-PK')}
             </p>
 
             <h4>Billing Address</h4>
-            {formData.billingAddressType === 'same' ? (
+            {isDifferentBilling ? (
               <>
-                <p>{formData.firstName} {formData.lastName}</p>
-                <p>{formData.address}</p>
-                <p>{formData.city} {formData.postalCode}</p>
+                <p>{values.billingFirstName} {values.billingLastName}</p>
+                {values.billingAddress && <p>{values.billingAddress}</p>}
+                <p>{values.billingCity}{values.billingPostalCode ? ` ${values.billingPostalCode}` : ''}</p>
                 <p>Pakistan</p>
-                {formData.phone && <p>{formData.phone}</p>}
+                {values.billingPhone && <p>{values.billingPhone}</p>}
               </>
             ) : (
-              <p>Different billing address</p>
+              <>
+                <p>{values?.firstName} {values?.lastName}</p>
+                <p>{values?.address}</p>
+                <p>{values?.city}{values?.postalCode ? ` ${values.postalCode}` : ''}</p>
+                <p>Pakistan</p>
+                {values?.phone && <p>{values.phone}</p>}
+              </>
             )}
 
             <div className="order-summary-total">
-              <p>Subtotal: <span>Rs. {subTotal.toLocaleString('en-PK')}</span></p>
-              <p>Shipping: <span>Rs. {shipping.toLocaleString('en-PK')}</span></p>
+              <p>Subtotal <span>Rs. {subTotal.toLocaleString('en-PK')}</span></p>
+              <p>Shipping <span>Rs. {shipping.toLocaleString('en-PK')}</span></p>
               <hr />
-              <p className="total">Total: <span>Rs. {total.toLocaleString('en-PK')}</span></p>
+              <p className="total">Total <span>Rs. {total.toLocaleString('en-PK')}</span></p>
             </div>
           </div>
 
@@ -147,6 +154,7 @@ const OrderConfirmation = () => {
             <button className="shopping">Continue Shopping</button>
           </Link>
         </div>
+
       </div>
     </>
   );
