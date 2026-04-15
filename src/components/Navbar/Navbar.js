@@ -1,16 +1,18 @@
 import logo from "../../assets/images/logo.png";
-import AccordionItem from "./AccordionItem";
-import "./Navbar.css";
-import "./MobileMenu.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
+import QuantitySelector from "../QuantitySelector/QuantitySelector";
+import AccordionItem from "./AccordionItem";
 import MobileMenu from "./MobileMenu";
 import Drawer from "../Drawer/Drawer";
-import { useCart } from "../../context/CartContext";
-import QuantitySelector from "../QuantitySelector/QuantitySelector";
+import "./Navbar.css";
+import "./MobileMenu.css";
 
 const Navbar = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, getCartCount } = useCart();
+  const { getWishlistCount } = useWishlist();
   const [searchActive, setSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,10 +25,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
-        searchActive &&
-        searchRef.current &&
-        !searchRef.current.contains(e.target)
-      ) {
+        searchActive && searchRef.current && !searchRef.current.contains(e.target)) {
         closeSearch();
       }
     };
@@ -36,9 +35,7 @@ const Navbar = () => {
 
   // Focus input when search opens
   useEffect(() => {
-    if (searchActive && inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (searchActive && inputRef.current) inputRef.current.focus();
   }, [searchActive]);
 
   const closeSearch = () => {
@@ -115,25 +112,29 @@ const Navbar = () => {
 
         {/* Right Icons */}
         <div className="nav-right">
-          <i
-            className="fa-solid fa-bag-shopping"
-            id="cart-icon"
-            onClick={() => setCartOpen(true)}
-          ></i>
-          <i
-            className="fa-solid fa-magnifying-glass"
-            onClick={() => setSearchActive(true)}
-          ></i>
+          {/* Wishlist */}
+          <div className="nav-icon-wrapper" onClick={() => navigate('/wishlist')}>
+            <i className="fa-regular fa-heart"></i>
+            {getWishlistCount() > 0 && (
+              <span className="nav-badge">{getWishlistCount()}</span>
+            )}
+          </div>
+
+          {/* Cart */}
+          <div className="nav-icon-wrapper" onClick={() => setCartOpen(true)}>
+            <i className="fa-solid fa-bag-shopping"></i>
+            {getCartCount() > 0 && (
+              <span className="nav-badge">{getCartCount()}</span>
+            )}
+          </div>
+
+          {/* Search */}
+          <i className="fa-solid fa-magnifying-glass" onClick={() => setSearchActive(true)}></i>
         </div>
       </nav>
 
       {/* Cart Drawer */}
-      <Drawer
-        isOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        position="right"
-        width="380px"
-      >
+      <Drawer isOpen={cartOpen} onClose={() => setCartOpen(false)} position="right" width="380px">
         <div className="cart-header">
           <h3>Your Cart ({getCartCount()})</h3>
           <i className="fa-solid fa-xmark" onClick={() => setCartOpen(false)}></i>
