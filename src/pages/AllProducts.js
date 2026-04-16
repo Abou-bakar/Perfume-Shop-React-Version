@@ -2,12 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ProductCard from '../components/Product/ProductCard';
-import '../styles/products.css';
 import FilterBar from '../components/FilterBar/FilterBar';
 import SortBar from '../components/SortBar/SortBar';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import ProductCardSkeleton from '../components/ProductSkeleton/ProductCardSkeleton';
+import '../styles/products.css';
 
 const AllProducts = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -147,8 +147,8 @@ const AllProducts = () => {
 
             <section className='product-container'>
 
-                {/* ── Search bar on the page (synced with navbar search) ── */}
-                <form className="products-search-bar" onSubmit={handleSearchSubmit}>
+               
+                {/* <form className="products-search-bar" onSubmit={handleSearchSubmit}>
                     <i className="fa-solid fa-magnifying-glass"></i>
                     <input
                         type="text"
@@ -161,10 +161,10 @@ const AllProducts = () => {
                             <i className="fa-solid fa-xmark"></i>
                         </button>
                     )}
-                </form>
+                </form> */}
 
                 {/* Active search indicator */}
-                {urlSearchQuery && (
+                {/* {urlSearchQuery && (
                     <div className="search-results-info">
                         <span>
                             Showing <strong>{filteredAndSortedProducts.length}</strong> result{filteredAndSortedProducts.length !== 1 ? 's' : ''} for <strong>"{urlSearchQuery}"</strong>
@@ -173,7 +173,7 @@ const AllProducts = () => {
                             Clear search
                         </button>
                     </div>
-                )}
+                )} */}
 
                 <div className='product-controls'>
                     <FilterBar
