@@ -1,10 +1,14 @@
 import React from 'react'
 import BottomTabItem from './BottomTabItem'
+import { useCart } from '../../context/CartContext'
 import "./BottomTab.css"
 
 const BottomTab = () => {
+   const { openCart, getCartCount, cartBump } = useCart();
+
   return (
      <div className="bottom-tab">
+
         <BottomTabItem 
         to="/"
         icon="fa-solid fa-house"
@@ -24,10 +28,13 @@ const BottomTab = () => {
         />
 
         <BottomTabItem 
-        to="/cart"
         icon="fa-solid fa-cart-shopping"
         label="Cart"
+        onClick={openCart}
+        badge={getCartCount()}
+        animate={cartBump}
         />
+
      </div>
   )
 }
