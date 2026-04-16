@@ -1,5 +1,4 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-
 import Home from './pages/Home';
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -16,15 +15,16 @@ import ProductDetails from './pages/ProductDetails';
 import MainLayout from './layouts/MainLayout';
 import MinimalLayout from './layouts/MinimalLayout';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import AllProducts from './pages/AllProducts';
 import AddProduct from './pages/AddProduct';
 import ManageProducts from './pages/ManageProducts';
 import ManageOrders from './pages/ManageOrders';
 import ManageInventory from './pages/ManageInventory';
-import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import AnalyticsPage from './pages/AnalyticsPage';
+import Wishlist from './pages/Wishlist';
 
 function App() {
   const location = useLocation();
@@ -33,54 +33,47 @@ function App() {
   const hideBottomTabRoutes = ['/admin', '/login', '/add-product', '/manage-products', '/checkout', '/order-confirmation']
 
   const hideBottomTab = hideBottomTabRoutes.includes(location.pathname)
-  
+
   return (
-    <AuthProvider>
-      <CartProvider>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="light"
-      />
-        <Routes>
+      <AuthProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <Routes>
 
-          {/* User pages */}
-          <Route element={<MainLayout />}>
-            <Route path='/' element={<Home />} />
-            <Route path='/about' element={<About />} />
-            <Route path='/contact' element={<Contact />} />
-            <Route path='/faq' element={<FAQ />} />
-            <Route path='/products' element={<AllProducts />} />
-            <Route path='/men' element={<Men />} />
-            <Route path='/women' element={<Women />} />
-            <Route path='/product/:id' element={<ProductDetails />} />
-            <Route path='/sale' element={<Sale />} />
-          </Route>
+              {/* User pages */}
+              <Route element={<MainLayout />}>
+                <Route path='/' element={<Home />} />
+                <Route path='/about' element={<About />} />
+                <Route path='/contact' element={<Contact />} />
+                <Route path='/faq' element={<FAQ />} />
+                <Route path='/products' element={<AllProducts />} />
+                <Route path='/men' element={<Men />} />
+                <Route path='/women' element={<Women />} />
+                <Route path='/product/:id' element={<ProductDetails />} />
+                <Route path='/sale' element={<Sale />} />
+                <Route path='/wishlist' element={<Wishlist />} />
+              </Route>
 
-          {/* Minimal pages */}
-          <Route element={<MinimalLayout />}>
-            <Route path='/checkout' element={<Checkout />} />
-            <Route path='/order-confirmation' element={<OrderConfirmation />} />
-            <Route path='/login' element={<Login />} />
+              {/* Minimal pages */}
+              <Route element={<MinimalLayout />}>
+                <Route path='/checkout' element={<Checkout />} />
+                <Route path='/order-confirmation' element={<OrderConfirmation />} />
+                <Route path='/login' element={<Login />} />
 
-            {/* Protected admin pages */}
-            <Route path='/admin' element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-            <Route path='/add-product' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
-            <Route path='/manage-products' element={<ProtectedRoute><ManageProducts /></ProtectedRoute>} />
-            <Route path='/manage-inventory' element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
-            <Route path='/manage-orders' element={<ProtectedRoute><ManageOrders /></ProtectedRoute>} />
-            <Route path='/analytics' element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
-          </Route>
+                {/* Protected admin pages */}
+                <Route path='/admin' element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path='/add-product' element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
+                <Route path='/manage-products' element={<ProtectedRoute><ManageProducts /></ProtectedRoute>} />
+                <Route path='/manage-inventory' element={<ProtectedRoute><ManageInventory /></ProtectedRoute>} />
+                <Route path='/manage-orders' element={<ProtectedRoute><ManageOrders /></ProtectedRoute>} />
+                <Route path='/analytics' element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
+              </Route>
 
-          {/* 404 Page */}
-          <Route path='*' element={<Error />} />
-        </Routes>
-      </CartProvider>
+              {/* 404 Page */}
+              <Route path='*' element={<Error />} />
+            </Routes>
+          </CartProvider>
+        </WishlistProvider>
       </AuthProvider>
   )
 }
