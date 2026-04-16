@@ -510,7 +510,7 @@ const Admin = () => {
                       <td>Percentage</td>
                       <td>01 Nov 2025</td>
                       <td>31 Nov 2025</td>
-                      <td><span className="status active">Active</span></td>
+                      <td><span className="status active-status">Active</span></td>
                       <td className="coupon-actions">
                         <button className="edit-btn">Edit</button>
                         <button className="delete-btn">Delete</button>
