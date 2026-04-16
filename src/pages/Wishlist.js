@@ -1,14 +1,12 @@
 import { useWishlist } from "../context/WishlistContext"
 import { useCart } from "../context/CartContext"
 import { Link, useNavigate } from "react-router-dom"
-import { useToast } from "../context/ToastContext";
 import { Helmet } from "react-helmet-async"
 import '../styles/wishlist.css';
 
 const Wishlist = () => {
-    const { wishlistItems, removeFromWishlist, addToWishlist } = useWishlist();
-    const { addToCart, undoAddToCart } = useCart();
-    const { addToast } = useToast();
+    const { wishlistItems, removeFromWishlist } = useWishlist();
+    const { addToCart } = useCart();
     const navigate = useNavigate();
 
     const formatPrice = (price) => {
@@ -19,37 +17,18 @@ const Wishlist = () => {
     };
 
     const handleAddToCart = (item) => {
-        try {
-            addToCart(item);
-            addToast(`${item.productName} added to cart`, "success", () => {
-                undoAddToCart(item.id);
-            });
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            addToast('Failed to add item to cart', "error");
-        }
+        addToCart(item);
+        // cart drawer opens automatically via CartContext
     };
 
     const handleRemove = (item) => {
         removeFromWishlist(item.id);
-
-        addToast(
-            `${item.productName} removed`,
-            "info",
-            () => {
-                addToWishlist(item);
-            }
-        );
-    };;
+        // heart unfills on product cards — no toast needed
+    };
 
     const handleMoveAllToCart = () => {
-        try {
-            wishlistItems.forEach(item => addToCart(item));
-            addToast('All items added to cart!', "success");
-        } catch (error) {
-            console.error('Error adding items to cart:', error);
-            addToast('Failed to add items to cart', "error");
-        }
+        wishlistItems.forEach(item => addToCart(item));
+        // cart opens on first addToCart call
     };
 
     return (
@@ -90,62 +69,59 @@ const Wishlist = () => {
                     </div>
                 ) : (
                     <div className="wishlist-grid">
-                        {wishlistItems.map(item => {
-                            const currentPrice = item.isSale ? item.discountedPrice : item.price;
-                            return (
-                                <div key={item.id} className="wishlist-card">
+                        {wishlistItems.map(item => (
+                            <div key={item.id} className="wishlist-card">
 
-                                    {/* Remove button */}
-                                    <button
-                                        className="wishlist-remove-btn"
-                                        onClick={() => handleRemove(item)}
-                                        aria-label="Remove from wishlist"
-                                    >
-                                        <i className="fa-solid fa-xmark"></i>
-                                    </button>
+                                {/* Remove button */}
+                                <button
+                                    className="wishlist-remove-btn"
+                                    onClick={() => handleRemove(item)}
+                                    aria-label="Remove from wishlist"
+                                >
+                                    <i className="fa-solid fa-xmark"></i>
+                                </button>
 
-                                    {/* Image */}
-                                    <div
-                                        className="wishlist-card-img-wrapper"
+                                {/* Image */}
+                                <div
+                                    className="wishlist-card-img-wrapper"
+                                    onClick={() => navigate(`/product/${item.id}`)}
+                                >
+                                    <img src={item.images} alt={item.productName} className="wishlist-card-img" />
+                                    {item.isSale && (
+                                        <span className="wishlist-sale-tag">{item.salePercent}% OFF</span>
+                                    )}
+                                </div>
+
+                                {/* Info */}
+                                <div className="wishlist-card-info">
+                                    <h3
+                                        className="wishlist-card-name"
                                         onClick={() => navigate(`/product/${item.id}`)}
                                     >
-                                        <img src={item.images} alt={item.productName} className="wishlist-card-img" />
-                                        {item.isSale && (
-                                            <span className="wishlist-sale-tag">{item.salePercent}% OFF</span>
+                                        {item.productName}
+                                    </h3>
+
+                                    <div className="wishlist-card-price">
+                                        {item.isSale ? (
+                                            <>
+                                                <span className="wishlist-original">Rs. {formatPrice(item.originalPrice)}</span>
+                                                <span className="wishlist-discounted">Rs. {formatPrice(item.discountedPrice)}</span>
+                                            </>
+                                        ) : (
+                                            <span>Rs. {formatPrice(item.price)}</span>
                                         )}
                                     </div>
 
-                                    {/* Info */}
-                                    <div className="wishlist-card-info">
-                                        <h3
-                                            className="wishlist-card-name"
-                                            onClick={() => navigate(`/product/${item.id}`)}
-                                        >
-                                            {item.productName}
-                                        </h3>
-
-                                        <div className="wishlist-card-price">
-                                            {item.isSale ? (
-                                                <>
-                                                    <span className="wishlist-original">Rs. {formatPrice(item.originalPrice)}</span>
-                                                    <span className="wishlist-discounted">Rs. {formatPrice(item.discountedPrice)}</span>
-                                                </>
-                                            ) : (
-                                                <span>Rs. {formatPrice(item.price)}</span>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            className="wishlist-add-cart-btn"
-                                            onClick={() => handleAddToCart(item)}
-                                        >
-                                            Add to Cart
-                                        </button>
-                                    </div>
-
+                                    <button
+                                        className="wishlist-add-cart-btn"
+                                        onClick={() => handleAddToCart(item)}
+                                    >
+                                        Add to Cart
+                                    </button>
                                 </div>
-                            );
-                        })}
+
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
@@ -153,4 +129,4 @@ const Wishlist = () => {
     );
 };
 
-export default Wishlist
+export default Wishlist;

@@ -17,11 +17,15 @@ export const WishlistProvider = ({ children }) => {
       localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
     }, [wishlistItems]);
 
+     const [wishlistBump, setWishlistBump] = useState(false);
+
     const addToWishlist = (product) => {
         setWishlistItems(prev => {
             if (prev.find(item => item.id === product.id)) return prev;
             return [...prev, product];
         });
+        setWishlistBump(true);
+        setTimeout(() => setWishlistBump(false), 300);
     };
 
     const removeFromWishlist = (productId) => {
@@ -46,6 +50,7 @@ export const WishlistProvider = ({ children }) => {
         <WishlistContext.Provider value={{
             wishlistItems,
             addToWishlist,
+            wishlistBump,
             removeFromWishlist,
             isInWishlist,
             toggleWishlist,
