@@ -96,8 +96,8 @@ const Contact = () => {
                 <label className="label" for="country">City *</label>
                 <input
                   className="input"
-                  id="country"
-                  name="country"
+                  id="city"
+                  name="city"
                   placeholder="Your city"
                   required
                 />
