@@ -19,10 +19,10 @@ const Footer = () => {
             <FooterColumns header="CUSTOMER SERVICE">
              <li><Link to="/about">About Us</Link></li>
           <li><Link to="/contact">Contact Us</Link></li>
-          <li><Link to="/contact">Privacy Policy</Link></li>
+          <li><Link to="/privacy-policy">Privacy Policy</Link></li>
           <li><Link to="/contact">Shipping Policy</Link></li>
           <li><Link to="/contact">Refund Policy</Link></li>
-          <li><Link to="/contact">Terms of Service</Link></li>
+          <li><Link to="/terms">Terms of Service</Link></li>
             </FooterColumns>
 
              {/* NEWSLETTER */}

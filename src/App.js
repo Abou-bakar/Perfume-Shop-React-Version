@@ -25,6 +25,8 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import AnalyticsPage from './pages/AnalyticsPage';
 import Wishlist from './pages/Wishlist';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 
 function App() {
   const location = useLocation();
@@ -46,6 +48,8 @@ function App() {
                 <Route path='/about' element={<About />} />
                 <Route path='/contact' element={<Contact />} />
                 <Route path='/faq' element={<FAQ />} />
+                <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+                <Route path='/terms' element={<Terms />} />
                 <Route path='/products' element={<AllProducts />} />
                 <Route path='/men' element={<Men />} />
                 <Route path='/women' element={<Women />} />
