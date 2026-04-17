@@ -8,6 +8,7 @@
   flex-direction: column;
   cursor: pointer;
   gap: 10px;
+  padding: 5px;
 }
 
 /* Image wrapper */

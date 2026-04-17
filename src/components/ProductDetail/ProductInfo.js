@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 import "./ProductInfo.css";
 
 const ProductInfo = ({ product, productName, price, salePrice }) => {
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '100ml')
   const [quantity, setQuantity] = useState(1)
 
@@ -20,21 +21,21 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
     }
 
     if (product.sizes?.length) {
-        const regularSize = product.sizes.find(s => s.size === selectedSize);
-        return {
-          price: regularSize?.price,
-          isSale: false
-        }
+      const regularSize = product.sizes.find(s => s.size === selectedSize);
+      return {
+        price: regularSize?.price,
+        isSale: false
       }
+    }
 
-      if (product.isSale && product.originalPrice && product.discountedPrice) {
-        return {
-          isSale: true,
-          original: product.originalPrice,
-          discounted: product.discountedPrice
-        }
+    if (product.isSale && product.originalPrice && product.discountedPrice) {
+      return {
+        isSale: true,
+        original: product.originalPrice,
+        discounted: product.discountedPrice
       }
-      return { price: product.price, isSale: false };
+    }
+    return { price: product.price, isSale: false };
   }
 
   const currentPrice = getCurrentPrice();
@@ -49,13 +50,28 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
     for (let i = 0; i < quantity; i++) {
       addToCart(productToAdd);
     }
-    toast.success(`${product.productName} (${selectedSize}) added to cart`);
   }
+
+  const wishlisted = isInWishlist(product.id);
+
+  const handleWishlistToggle = () => {
+    toggleWishlist(product);
+  };
 
   return (
     <div className="product-detail">
       <div className="product-info">
-        <h1>{product.productName}</h1>
+        <div className="product-header">
+          <h1>{product.productName}</h1>
+
+          <button
+            className={`wishlist-btn-large ${wishlisted ? 'wishlisted' : ''}`}
+            onClick={handleWishlistToggle}
+            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <i className={wishlisted ? "fa-solid fa-heart" : "fa-regular fa-heart"}></i>
+          </button>
+        </div>
 
         <div className="delivery">
           <i className="fa-solid fa-truck-fast"></i>
@@ -89,7 +105,7 @@ const ProductInfo = ({ product, productName, price, salePrice }) => {
               <div
                 key={index}
                 className={`size-box ${selectedSize === sizeObj.size ? "active" : ""}`}
-                onClick={()=> setSelectedSize(sizeObj.size)}
+                onClick={() => setSelectedSize(sizeObj.size)}
               >
                 {sizeObj.size}
               </div>
